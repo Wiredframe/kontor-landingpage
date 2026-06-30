@@ -3,6 +3,10 @@
 Marketing-Website für **Kontor**, die native macOS-Buchhaltungs-App für
 KSK-versicherte Freiberufler (EÜR, UStVA, KSK, Rücklagen – lokal auf dem Mac).
 
+[![Website ansehen](https://img.shields.io/badge/Website-ansehen-7c3aed?style=for-the-badge&logo=safari&logoColor=white)](https://wiredframe.github.io/kontor-landingpage/) [![Spenden](https://img.shields.io/badge/Spenden-Stripe-e11d48?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://wiredframe.github.io/kontor-landingpage/#spenden)
+
+**Live: [wiredframe.github.io/kontor-landingpage](https://wiredframe.github.io/kontor-landingpage/)** · Quelle: `index.html`
+
 Statische Single-Page-Site: eine einzige `index.html` mit Tailwind (Play-CDN),
 der Schrift *Plus Jakarta Sans* und browsernativen scroll-driven Animations.
 Light/Dark/System-Umschaltung, die echte App-UI als HTML/CSS nachgebaut, eine
