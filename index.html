@@ -1,0 +1,3040 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Kontor – Buchhaltung für Freiberufler, lokal auf deinem Mac</title>
+	<meta name="description"
+		content="Kontor ist die native macOS-Buchhaltungs-App für KSK-versicherte Freiberufler. EÜR, UStVA, KSK, Rücklagen – steuerlich korrekt gerechnet, lokal gespeichert, kein Abo." />
+	<link rel="icon" type="image/png" href="assets/AppIcon-512.png" />
+	<link rel="apple-touch-icon" href="assets/AppIcon-512.png" />
+	<meta name="theme-color" content="#f5f5f7" />
+	<!-- Theme: follow the system by default; a manual choice (stored) wins. Set before paint to avoid flash. -->
+	<script>
+		(function () {
+			try {
+				var stored = localStorage.getItem('kontor-theme'); // 'light' | 'dark' | 'system' | null
+				var sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+				var dark = stored === 'dark' || ((stored === 'system' || !stored) && sysDark);
+				if (dark) document.documentElement.classList.add('dark');
+				var m = document.querySelector('meta[name="theme-color"]');
+				if (m) m.setAttribute('content', dark ? '#0a0a0c' : '#f5f5f7');
+			} catch (e) { }
+		})();
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..600&display=swap"
+		rel="stylesheet" />
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = {
+			darkMode: 'class',
+			theme: {
+				extend: {
+					fontFamily: {
+						display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+						sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+						mono: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+					},
+					colors: {
+						brand: { 400: '#7CA3F7', 500: '#5690F4', 600: '#5E63EA', 700: '#6C38E0' },
+					},
+				},
+			},
+		};
+	</script>
+	<style>
+		:root {
+			--bg: #f5f5f7;
+			--bg-2: #ececef;
+			--surface: #ffffff;
+			--surface-2: #fafafc;
+			--ink: #1d1d1f;
+			--ink-2: #3a3a3e;
+			--muted: #6e6e73;
+			--hair: rgba(0, 0, 0, .09);
+			--brand: #5b62ee;
+			--brand-2: #6c38e0;
+			--brand-blue: #5690f4;
+			--pos: #128a5c;
+			--neg: #c0392f;
+			--shadow: 0 30px 60px -24px rgba(28, 28, 40, .28), 0 8px 24px -16px rgba(28, 28, 40, .20);
+			--shadow-soft: 0 14px 34px -18px rgba(15, 18, 42, .34);
+			/* compact shadow used inside the mobile pan */
+			--pan-gutter: 1.25rem;
+			/* = section padding (px-5): keeps panels off the screen edges */
+			--pan-shadow-room: 1.75rem;
+			/* vertical room so the pan scroller can't clip the card shadow */
+		}
+
+		.dark {
+			--bg: #0a0a0c;
+			--bg-2: #111114;
+			--surface: #161619;
+			--surface-2: #1d1d21;
+			--ink: #f3f3f6;
+			--ink-2: #d7d7dc;
+			--muted: #9a9aa1;
+			--hair: rgba(255, 255, 255, .11);
+			--brand: #8b93ff;
+			--brand-2: #a273ff;
+			--brand-blue: #7fb0ff;
+			--pos: #41d692;
+			--neg: #ff6b5e;
+			--shadow: 0 40px 80px -28px rgba(0, 0, 0, .7), 0 10px 30px -18px rgba(0, 0, 0, .6);
+		}
+
+		html {
+			scroll-padding-top: 5.5rem;
+			overflow-x: clip;
+		}
+
+		body {
+			background: var(--bg);
+			color: var(--ink);
+			-webkit-font-smoothing: antialiased;
+		}
+
+		::selection {
+			background: color-mix(in srgb, var(--brand) 28%, transparent);
+		}
+
+		.font-display {
+			letter-spacing: -0.022em;
+		}
+
+		.num {
+			font-variant-numeric: tabular-nums;
+			letter-spacing: -0.005em;
+		}
+
+		.eyebrow {
+			font-size: .74rem;
+			line-height: 1;
+			font-weight: 600;
+			letter-spacing: .15em;
+			text-transform: uppercase;
+			color: var(--muted);
+			display: inline-flex;
+			align-items: center;
+			gap: .55rem;
+		}
+
+		.eyebrow::before {
+			content: "";
+			width: 1.4rem;
+			height: 1px;
+			background: var(--brand);
+			opacity: .8;
+		}
+
+		.brand-text {
+			background: linear-gradient(100deg, var(--brand-blue), var(--brand-2));
+			-webkit-background-clip: text;
+			background-clip: text;
+			color: transparent;
+		}
+
+		.hairline {
+			border-color: var(--hair);
+		}
+
+		/* Screenshots keep their own baked macOS shadow — no extra frame */
+		.device img {
+			width: 100%;
+			height: auto;
+		}
+
+		/* Static hero gradient (replaces the WebGL shader) */
+		.hero-bg {
+			background:
+				radial-gradient(115% 70% at 16% 0%, rgba(86, 144, 244, .20), transparent 58%),
+				radial-gradient(100% 78% at 90% 4%, rgba(108, 56, 224, .16), transparent 56%),
+				linear-gradient(180deg, #eaeef9 0%, var(--bg) 56%);
+		}
+
+		html.dark .hero-bg {
+			background:
+				radial-gradient(115% 70% at 14% -4%, rgba(96, 140, 255, .22), transparent 60%),
+				radial-gradient(100% 80% at 92% 2%, rgba(150, 96, 255, .18), transparent 56%),
+				linear-gradient(180deg, #10132e 0%, var(--bg) 60%);
+		}
+
+		/* Light/Dark asset swap — bound to .dark on <html> (independent of Tailwind dark variant) */
+		.imlight {
+			display: block;
+		}
+
+		.imdark {
+			display: none;
+		}
+
+		html.dark .imlight {
+			display: none;
+		}
+
+		html.dark .imdark {
+			display: block;
+		}
+
+		/* CTA */
+		.btn-primary {
+			background: linear-gradient(120deg, var(--brand-blue), var(--brand-2));
+			color: #fff;
+			box-shadow: 0 10px 26px -10px color-mix(in srgb, var(--brand) 70%, transparent);
+		}
+
+		.btn-primary:hover {
+			filter: brightness(1.06) saturate(1.05);
+		}
+
+		.btn-ghost {
+			border: 1px solid var(--hair);
+			color: var(--ink);
+			background: color-mix(in srgb, var(--surface) 70%, transparent);
+		}
+
+		.btn-ghost:hover {
+			border-color: color-mix(in srgb, var(--brand) 45%, var(--hair));
+		}
+
+		a,
+		button {
+			transition: color .18s, background-color .18s, border-color .18s, filter .18s, transform .18s;
+		}
+
+		:focus-visible {
+			outline: 2px solid var(--brand);
+			outline-offset: 3px;
+			border-radius: 6px;
+		}
+
+		/* ---- Scroll-driven animations (progressive enhancement) ---- */
+		.reveal {
+			opacity: 1;
+		}
+
+		/* default visible if unsupported */
+		@keyframes reveal-up {
+			from {
+				opacity: 0;
+				transform: translateY(38px);
+			}
+
+			to {
+				opacity: 1;
+				transform: none;
+			}
+		}
+
+		@keyframes rise-shot {
+			from {
+				opacity: 0;
+				transform: translateY(60px);
+			}
+
+			to {
+				opacity: 1;
+				transform: none;
+			}
+		}
+
+		@keyframes parallax {
+			to {
+				transform: translateY(-46px);
+			}
+		}
+
+		@keyframes grow-x {
+			from {
+				transform: scaleX(0);
+			}
+
+			to {
+				transform: scaleX(1);
+			}
+		}
+
+		@media (prefers-reduced-motion: no-preference) {
+			@supports (animation-timeline: view()) {
+				.reveal {
+					animation: reveal-up both linear;
+					animation-timeline: view();
+					animation-range: entry 2% cover 26%;
+				}
+
+				.reveal.d1 {
+					animation-range: entry 7% cover 31%;
+				}
+
+				.reveal.d2 {
+					animation-range: entry 12% cover 36%;
+				}
+
+				.reveal.d3 {
+					animation-range: entry 17% cover 41%;
+				}
+
+				.wf-row {
+					animation: reveal-up both linear;
+					animation-timeline: view();
+					animation-range: entry 0% cover 30%;
+				}
+
+				.hero-rise {
+					animation: rise-shot both linear;
+					animation-timeline: view();
+					animation-range: entry 0% cover 34%;
+				}
+
+				.ui-r {
+					animation: reveal-up both linear;
+					animation-timeline: view();
+					animation-range: entry 0% cover 28%;
+				}
+
+				.bar-grow {
+					animation: grow-y both linear;
+					animation-timeline: view();
+					animation-range: entry 6% cover 50%;
+					transform-origin: bottom;
+				}
+			}
+
+			@supports (animation-timeline: scroll()) {
+				.hero-shot {
+					animation: parallax both linear;
+					animation-timeline: scroll(root);
+					animation-range: 0 92vh;
+				}
+
+				.progress {
+					animation: grow-x both linear;
+					animation-timeline: scroll(root);
+				}
+			}
+		}
+
+		details.faq {
+			border-bottom: 1px solid var(--hair);
+		}
+
+		details.faq summary {
+			list-style: none;
+			cursor: pointer;
+		}
+
+		details.faq summary::-webkit-details-marker {
+			display: none;
+		}
+
+		details.faq summary .chev {
+			transition: transform .25s ease;
+		}
+
+		details.faq[open] summary .chev {
+			transform: rotate(45deg);
+		}
+
+		.pill {
+			border: 1px solid var(--hair);
+			color: var(--muted);
+			background: color-mix(in srgb, var(--surface) 55%, transparent);
+		}
+
+		/* ---- Native UI excerpts (rebuilt app panels) ---- */
+		.ui-card {
+			background: var(--surface);
+			border-radius: 18px;
+			box-shadow: var(--shadow);
+		}
+
+		.ui-hover {
+			transition: transform .4s cubic-bezier(.2, .7, .2, 1), box-shadow .4s ease;
+		}
+
+		.ui-tab {
+			font-size: .76rem;
+			font-weight: 600;
+			padding: .25rem .7rem;
+			border-radius: 8px;
+			color: var(--muted);
+		}
+
+		.ui-tab.on {
+			background: var(--surface);
+			color: var(--ink);
+			box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+		}
+
+		.kz {
+			font-variant-numeric: tabular-nums;
+			font-size: .66rem;
+			font-weight: 700;
+			letter-spacing: .01em;
+			padding: .16rem .42rem;
+			border-radius: 6px;
+			background: color-mix(in srgb, var(--brand) 13%, transparent);
+			color: var(--brand);
+			white-space: nowrap;
+		}
+
+		@keyframes grow-y {
+			from {
+				transform: scaleY(.05);
+			}
+
+			to {
+				transform: scaleY(1);
+			}
+		}
+
+		/* copy-on-click (the app's "jede Zahl kopierbar") */
+		.copyable {
+			cursor: pointer;
+			border-radius: 7px;
+			position: relative;
+			transition: background-color .15s ease;
+		}
+
+		.copyable::after {
+			content: "kopiert";
+			position: absolute;
+			top: -1.35rem;
+			right: .1rem;
+			font-size: .6rem;
+			font-weight: 700;
+			letter-spacing: .03em;
+			color: var(--pos);
+			background: color-mix(in srgb, var(--pos) 16%, var(--surface));
+			border: 1px solid color-mix(in srgb, var(--pos) 34%, transparent);
+			padding: .06rem .34rem;
+			border-radius: 5px;
+			opacity: 0;
+			transform: translateY(4px);
+			pointer-events: none;
+			transition: opacity .2s ease, transform .2s ease;
+		}
+
+		.copyable.copied::after {
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		/* Kontoauszug triage: book / skip an entry */
+		.kt-row {
+			transition: opacity .4s ease, background-color .2s ease, transform .4s ease;
+		}
+
+		.kt-row .kt-status {
+			display: none;
+		}
+
+		.kt-row.booked .kt-actions,
+		.kt-row.skipped .kt-actions {
+			display: none;
+		}
+
+		.kt-row.booked .kt-status,
+		.kt-row.skipped .kt-status {
+			display: inline-flex;
+		}
+
+		.kt-row.booked {
+			opacity: .6;
+		}
+
+		.kt-row.skipped {
+			opacity: .32;
+		}
+
+		@media (hover: hover) {
+			.copyable:hover {
+				background: color-mix(in srgb, var(--brand) 10%, transparent);
+			}
+		}
+
+		/* lift only on real desktop (≥768px) — where no horizontal pan container exists to clip the grown shadow */
+		@media (hover: hover) and (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+			.ui-hover:hover {
+				transform: translateY(-6px);
+				box-shadow: 0 42px 72px -30px rgba(12, 14, 32, .45);
+			}
+		}
+
+		/* 3-way theme cycle button — show only the current mode's icon */
+		#theme-toggle svg {
+			display: none;
+		}
+
+		#theme-toggle[data-mode="light"] .ic-light,
+		#theme-toggle[data-mode="dark"] .ic-dark,
+		#theme-toggle[data-mode="system"] .ic-system {
+			display: block;
+		}
+
+		/* hero window · bars grow on load (per-column delay set in JS) */
+		@media (prefers-reduced-motion: no-preference) {
+			.hw-bar {
+				transform: scaleY(0);
+				transform-origin: bottom;
+				animation: grow-y .8s cubic-bezier(.2, .8, .2, 1) both;
+			}
+		}
+
+		/* The rebuilt panels (.pan-x) are wider than a phone. On mobile they go full-bleed and pan
+     horizontally without a scrollbar. The horizontal padding (--pan-gutter) keeps each panel off
+     both screen edges at the scroll ends, while it still bleeds to the edge in between. The block
+     padding (cancelled by a negative block margin) gives the drop shadow room so the scroll
+     container can't clip it. The negative inline margin (= −var(--pan-gutter), i.e. the section
+     padding) breaks out exactly to the viewport edges — no vw, so a scrollbar can't offset it;
+     min-width:0 lets the grid/flex parents shrink so a wide panel never widens the page itself. */
+		@media (min-width: 640px) {
+			:root {
+				--pan-gutter: 2rem;
+			}
+		}
+
+		/* = sm:px-8 */
+		@media (max-width: 767px) {
+
+			.ui-card,
+			.hero-window {
+				box-shadow: var(--shadow-soft);
+			}
+
+			.reveal,
+			.hero-shot {
+				min-width: 0;
+			}
+
+			.pan-x {
+				min-width: 0;
+				overflow-x: auto;
+				overflow-y: visible;
+				-webkit-overflow-scrolling: touch;
+				scrollbar-width: none;
+				margin-block: calc(var(--pan-shadow-room) * -1);
+				margin-inline: calc(var(--pan-gutter) * -1);
+				padding-block: var(--pan-shadow-room);
+				padding-inline: var(--pan-gutter);
+			}
+
+			.pan-x::-webkit-scrollbar {
+				display: none;
+			}
+
+			.pan-x>.ui-card {
+				min-width: 27rem;
+			}
+
+			.pan-x>.hero-window {
+				min-width: 34rem;
+			}
+		}
+
+		/* Screenshot gallery (touchpad-scrollable, scroll-snap) + zoom lightbox */
+		.gal-scroll {
+			scrollbar-width: none;
+			scroll-padding-inline: 1.25rem;
+		}
+
+		.gal-scroll::-webkit-scrollbar {
+			display: none;
+		}
+
+		.gal-zoom {
+			display: block;
+			width: 100%;
+			border-radius: 16px;
+			cursor: zoom-in;
+			transition: transform .35s cubic-bezier(.2, .7, .2, 1);
+		}
+
+		.gal-img {
+			width: 100%;
+			height: auto;
+			border-radius: 16px;
+		}
+
+		@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+			.gal-zoom:hover {
+				transform: translateY(-6px);
+			}
+		}
+
+		@media (max-width: 767px) {
+			.gal-zoom {
+				cursor: default;
+			}
+		}
+
+		/* no lightbox on mobile → no zoom cursor */
+		#lightbox {
+			display: none;
+		}
+
+		#lightbox.open {
+			display: flex;
+		}
+
+		.lb-backdrop {
+			background: color-mix(in srgb, var(--bg) 74%, #000);
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+		}
+
+		#lb-close {
+			background: color-mix(in srgb, var(--surface) 85%, transparent);
+			border: 1px solid var(--hair);
+			color: var(--ink);
+			backdrop-filter: blur(6px);
+		}
+
+		@media (hover: hover) {
+			#lb-close:hover {
+				background: var(--surface);
+			}
+		}
+
+		@media (prefers-reduced-motion: no-preference) {
+
+			::view-transition-old(zoom-img),
+			::view-transition-new(zoom-img) {
+				animation-duration: .42s;
+				animation-timing-function: cubic-bezier(.2, .7, .2, 1);
+			}
+		}
+
+		/* Legal modal (Impressum / Datenschutz / Nutzungsbedingungen) */
+		.link-btn {
+			font: inherit;
+			color: inherit;
+			background: none;
+			border: 0;
+			padding: 0;
+			cursor: pointer;
+		}
+
+		#legal {
+			display: none;
+		}
+
+		#legal.open {
+			display: flex;
+		}
+
+		.legal-backdrop {
+			background: color-mix(in srgb, var(--bg) 68%, #000);
+			backdrop-filter: blur(9px);
+			-webkit-backdrop-filter: blur(9px);
+		}
+
+		.legal-panel {
+			background: var(--surface);
+			border: 1px solid var(--hair);
+			border-radius: 20px;
+			box-shadow: var(--shadow);
+		}
+
+		.legal-scroll {
+			overflow-y: auto;
+			overscroll-behavior: contain;
+		}
+
+		.legal-scroll::-webkit-scrollbar {
+			width: 11px;
+		}
+
+		.legal-scroll::-webkit-scrollbar-thumb {
+			background: color-mix(in srgb, var(--muted) 38%, transparent);
+			border-radius: 9px;
+			border: 3px solid var(--surface);
+		}
+
+		.legal-prose h3 {
+			font-weight: 700;
+			font-size: 1.04rem;
+			letter-spacing: -0.01em;
+			margin-top: 1.6rem;
+		}
+
+		.legal-prose h3:first-child {
+			margin-top: 0;
+		}
+
+		.legal-prose p {
+			color: var(--ink-2);
+			line-height: 1.7;
+			margin-top: .5rem;
+			font-size: .94rem;
+		}
+
+		.legal-prose .lead {
+			color: var(--muted);
+		}
+
+		.legal-prose strong {
+			color: var(--ink);
+		}
+
+		.legal-prose a {
+			color: var(--brand);
+			text-decoration: underline;
+			text-underline-offset: 2px;
+		}
+	</style>
+</head>
+
+<body class="font-sans antialiased">
+	<!-- scroll progress -->
+	<div class="progress fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left"
+		style="transform:scaleX(0);background:linear-gradient(90deg,var(--brand-blue),var(--brand-2))"></div>
+	<!-- ============ HEADER ============ -->
+	<header class="fixed top-0 inset-x-0 z-50 backdrop-blur-xl"
+		style="background:color-mix(in srgb,var(--bg) 72%,transparent);border-bottom:1px solid var(--hair)">
+		<div class="mx-auto max-w-7xl px-5 sm:px-8 h-[4.25rem] flex items-center justify-between gap-4">
+			<a href="#top" class="flex items-center gap-2.5 shrink-0">
+				<img src="assets/AppIcon-512.png" alt="Kontor App-Icon" class="w-8 h-8 rounded-[9px] shadow-sm" />
+				<span class="font-display text-[1.35rem] font-bold tracking-tight">Kontor</span>
+			</a>
+			<nav class="hidden lg:flex items-center gap-8 text-[.92rem]" style="color:var(--ink-2)">
+				<a href="#frei" class="hover:opacity-70">Frei verfügbar</a>
+				<a href="#alltag" class="hover:opacity-70">Belege &amp; Import</a>
+				<a href="#besonders" class="hover:opacity-70">Sonderfälle</a>
+				<a href="#anbord" class="hover:opacity-70">Alles an Bord</a>
+				<a href="#preis" class="hover:opacity-70">Preis</a>
+				<a href="#faq" class="hover:opacity-70">FAQ</a>
+			</nav>
+			<div class="flex items-center gap-2.5 shrink-0">
+				<button id="theme-toggle" data-mode="system"
+					class="btn-ghost grid place-items-center w-10 h-10 rounded-full"
+					aria-label="Erscheinungsbild wechseln" title="Erscheinungsbild: System">
+					<svg class="ic-light w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+						stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="12" cy="12" r="4" />
+						<path
+							d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+					</svg>
+					<svg class="ic-dark w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+						stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+					</svg>
+					<svg class="ic-system w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+						stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+						<rect x="2" y="4" width="20" height="13" rx="2" />
+						<path d="M8 21h8M12 17v4" />
+					</svg>
+				</button>
+				<a href="#preis"
+					class="btn-primary hidden sm:inline-flex items-center gap-2 rounded-full px-4 h-10 text-[.9rem] font-semibold">
+					<span class="num">19,99 €</span><span class="opacity-80 font-normal hidden md:inline">· macOS</span>
+				</a>
+			</div>
+		</div>
+	</header>
+	<main id="top">
+		<!-- ============ HERO ============ -->
+		<section class="relative">
+			<div class="hero-bg absolute inset-0"></div>
+			<div class="relative mx-auto max-w-7xl px-5 sm:px-8 pt-28 sm:pt-36 pb-10 text-center">
+				<span class="eyebrow justify-center">Buchhaltung für Freiberufler · macOS</span>
+				<h1
+					class="font-display font-extrabold mt-6 mx-auto max-w-[18ch] text-[clamp(2.5rem,6.2vw,4.75rem)] leading-[1.02] text-balance">
+					Buchhaltung, die rechnet wie dein Steuerberater – und schweigt wie ein <span
+						class="brand-text">Tresor</span>. </h1>
+				<p class="mt-6 mx-auto max-w-[52ch] text-[1.12rem] leading-relaxed" style="color:var(--muted)"> Kontor
+					ist die Buchhaltungs-App für Freiberufler, die Steuern ernst nimmt und die Cloud verweigert. EÜR,
+					Umsatzsteuer-Voranmeldung, KSK, Rücklagen – alles korrekt, alles lokal auf deinem Mac. </p>
+				<div class="mt-9 flex flex-wrap items-center justify-center gap-3">
+					<a href="#preis"
+						class="btn-primary inline-flex items-center gap-2.5 rounded-full px-6 h-[3.25rem] text-[1rem] font-semibold">
+						Für macOS kaufen · <span class="num">19,99 €</span>
+					</a>
+					<a href="#besonders"
+						class="btn-ghost inline-flex items-center gap-2 rounded-full px-6 h-[3.25rem] text-[1rem] font-medium">
+						Funktionen ansehen <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+							stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M5 12h14M13 6l6 6-6 6" />
+						</svg>
+					</a>
+				</div>
+				<p class="eyebrow justify-center mt-6 normal-case tracking-[.04em]" style="font-size:.74rem">
+					Einmalkauf&nbsp;·&nbsp;kein Abo&nbsp;·&nbsp;keine Cloud&nbsp;·&nbsp;macOS&nbsp;15+ </p>
+				<!-- hero screenshot -->
+				<div class="hero-rise mt-14 sm:mt-16">
+					<div class="hero-shot pan-x md:mx-auto max-w-5xl text-left">
+						<!-- native rebuild · macOS-Fenster „Übersicht" -->
+						<div class="hero-window ui-card ui-hover overflow-hidden flex flex-col lg:aspect-[16/10]">
+							<!-- titlebar -->
+							<div class="flex items-center gap-2 px-4 h-11 shrink-0"
+								style="border-bottom:1px solid var(--hair);background:var(--surface-2)">
+								<span class="flex gap-2">
+									<span class="w-3 h-3 rounded-full" style="background:#ff5f57"></span>
+									<span class="w-3 h-3 rounded-full" style="background:#febc2e"></span>
+									<span class="w-3 h-3 rounded-full" style="background:#28c840"></span>
+								</span>
+								<span class="ml-3 text-[.82rem] font-semibold" style="color:var(--ink-2)">Kontor</span>
+								<span class="ml-auto text-[.74rem] num" style="color:var(--muted)"><span
+										class="js-month">Juni</span> <span class="js-year">2026</span></span>
+							</div>
+							<div class="flex flex-1 min-h-0">
+								<!-- sidebar -->
+								<aside class="hidden sm:flex flex-col gap-3 w-52 shrink-0 p-4"
+									style="border-right:1px solid var(--hair);background:var(--surface-2)">
+									<div>
+										<div class="text-[.6rem] font-semibold uppercase tracking-[.12em] px-2 mb-1"
+											style="color:var(--muted)">Arbeitsfläche</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem] font-medium"
+											style="background:color-mix(in srgb,var(--brand) 15%,transparent);color:var(--brand)">
+											<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none"
+												stroke="currentColor" stroke-width="1.8">
+												<rect x="3" y="3" width="7" height="7" rx="1.5" />
+												<rect x="14" y="3" width="7" height="7" rx="1.5" />
+												<rect x="3" y="14" width="7" height="7" rx="1.5" />
+												<rect x="14" y="14" width="7" height="7" rx="1.5" />
+											</svg>Übersicht</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem]"
+											style="color:var(--ink-2)"><svg class="w-3.5 h-3.5 shrink-0"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+												stroke-linecap="round">
+												<rect x="3" y="4" width="18" height="17" rx="2" />
+												<path d="M3 9h18M8 2v4M16 2v4" />
+											</svg>Monatsabschluss</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem]"
+											style="color:var(--ink-2)"><svg class="w-3.5 h-3.5 shrink-0"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+												stroke-linecap="round" stroke-linejoin="round">
+												<path d="M3 9.5 12 4l9 5.5" />
+												<path d="M5 10.5V19M9.5 10.5V19M14.5 10.5V19M19 10.5V19" />
+												<path d="M3.5 19h17" />
+											</svg>Kontoauszug</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem]"
+											style="color:var(--ink-2)"><svg class="w-3.5 h-3.5 shrink-0"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+												stroke-linecap="round" stroke-linejoin="round">
+												<path d="M9 11l3 3L22 4" />
+												<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+											</svg>Aufgaben</div>
+									</div>
+									<div>
+										<div class="text-[.6rem] font-semibold uppercase tracking-[.12em] px-2 mb-1"
+											style="color:var(--muted)">Stammdaten</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem]"
+											style="color:var(--ink-2)"><svg class="w-3.5 h-3.5 shrink-0"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+												stroke-linecap="round" stroke-linejoin="round">
+												<circle cx="12" cy="12" r="9" />
+												<path d="M12 7.5v5l3 1.8" />
+											</svg>Einnahmen</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem]"
+											style="color:var(--ink-2)"><svg class="w-3.5 h-3.5 shrink-0"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+												stroke-linecap="round" stroke-linejoin="round">
+												<rect x="2" y="5" width="20" height="14" rx="2" />
+												<path d="M2 10h20" />
+											</svg>Ausgaben</div>
+									</div>
+									<div>
+										<div class="text-[.6rem] font-semibold uppercase tracking-[.12em] px-2 mb-1"
+											style="color:var(--muted)">Auswertungen</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem]"
+											style="color:var(--ink-2)"><svg class="w-3.5 h-3.5 shrink-0"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+												stroke-linecap="round" stroke-linejoin="round">
+												<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+												<path d="M14 2v6h6M9 13h6M9 17h6" />
+											</svg>UStVA</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem]"
+											style="color:var(--ink-2)"><svg class="w-3.5 h-3.5 shrink-0"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+												stroke-linecap="round" stroke-linejoin="round">
+												<path d="M3 3v18h18" />
+												<rect x="7" y="11" width="3" height="7" />
+												<rect x="13" y="7" width="3" height="11" />
+											</svg>Jahresabschluss</div>
+									</div>
+									<div>
+										<div class="text-[.6rem] font-semibold uppercase tracking-[.12em] px-2 mb-1"
+											style="color:var(--muted)">Privat</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem]"
+											style="color:var(--ink-2)"><svg class="w-3.5 h-3.5 shrink-0"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+												stroke-linecap="round" stroke-linejoin="round">
+												<circle cx="12" cy="12" r="9" />
+												<circle cx="12" cy="9.8" r="2.6" />
+												<path d="M7 17.4c1-2.1 2.8-3.2 5-3.2s4 1.1 5 3.2" />
+											</svg>Privat-Übersicht</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem]"
+											style="color:var(--ink-2)"><svg class="w-3.5 h-3.5 shrink-0"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+												stroke-linecap="round" stroke-linejoin="round">
+												<circle cx="9" cy="21" r="1" />
+												<circle cx="19" cy="21" r="1" />
+												<path
+													d="M2 3h3l2.4 12.3a1.6 1.6 0 0 0 1.6 1.3h8.6a1.6 1.6 0 0 0 1.6-1.3L22 7H6" />
+											</svg>Lebensmittel</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem]"
+											style="color:var(--ink-2)"><svg class="w-3.5 h-3.5 shrink-0"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+												stroke-linecap="round" stroke-linejoin="round">
+												<path d="M6 7h12l-1 13a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z" />
+												<path d="M9 7V6a3 3 0 0 1 6 0v1" />
+											</svg>Einkäufe</div>
+									</div>
+									<div>
+										<div class="text-[.6rem] font-semibold uppercase tracking-[.12em] px-2 mb-1"
+											style="color:var(--muted)">System</div>
+										<div class="flex items-center gap-2 px-2 py-1 rounded-lg text-[.82rem]"
+											style="color:var(--ink-2)"><svg class="w-3.5 h-3.5 shrink-0"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+												stroke-linecap="round" stroke-linejoin="round">
+												<circle cx="12" cy="12" r="3" />
+												<path
+													d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+											</svg>Einstellungen</div>
+									</div>
+								</aside>
+								<!-- main -->
+								<div class="flex-1 p-4 sm:p-5 min-w-0 flex flex-col">
+									<div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+										<div class="rounded-xl p-3"
+											style="background:var(--surface);border:1px solid var(--hair)">
+											<div class="text-[.64rem]" style="color:var(--muted)">Offene Rechnungen
+											</div>
+											<div class="num font-semibold text-[1.02rem] mt-1">4.046,00 €</div>
+										</div>
+										<div class="rounded-xl p-3"
+											style="background:var(--surface);border:1px solid var(--hair)">
+											<div class="text-[.64rem]" style="color:var(--muted)">USt-Zahllast · <span
+													class="js-quarter">Q2</span></div>
+											<div class="num font-semibold text-[1.02rem] mt-1">1.780,30 €</div>
+										</div>
+										<div class="rounded-xl p-3"
+											style="background:var(--surface);border:1px solid var(--hair)">
+											<div class="text-[.64rem]" style="color:var(--muted)">Umsatz · <span
+													class="js-month">Juni</span></div>
+											<div class="num font-semibold text-[1.02rem] mt-1 js-umsatz">3.400,00 €
+											</div>
+										</div>
+										<div class="rounded-xl p-3"
+											style="background:var(--surface);border:1px solid var(--hair)">
+											<div class="text-[.64rem]" style="color:var(--muted)">Nächste Frist</div>
+											<div class="font-semibold text-[1.02rem] mt-1 js-deadline">30. Juni</div>
+										</div>
+									</div>
+									<div class="mt-4 rounded-xl p-4 flex flex-col lg:flex-1 lg:min-h-0"
+										style="background:var(--surface);border:1px solid var(--hair)">
+										<div class="flex items-center justify-between">
+											<span class="font-semibold text-[.9rem]">Betrieblicher Gewinn</span>
+											<div class="flex items-center gap-1 p-1 rounded-[9px]"
+												style="background:var(--bg-2)"><span
+													class="ui-tab on">Gewinn</span><span class="ui-tab">Frei</span><span
+													class="ui-tab">Rücklage</span></div>
+										</div>
+										<div id="hw-chart"
+											class="mt-4 flex items-end gap-1.5 sm:gap-2 h-28 sm:h-32 lg:h-auto lg:flex-1 lg:min-h-0">
+											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
+													class="hw-bar rounded-t"
+													style="height:82%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+											</div>
+											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
+													class="hw-bar rounded-t"
+													style="height:86%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+											</div>
+											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
+													class="hw-bar rounded-t"
+													style="height:82%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+											</div>
+											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
+													class="hw-bar rounded-t"
+													style="height:96%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+											</div>
+											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
+													class="hw-bar rounded-t"
+													style="height:88%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+											</div>
+											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
+													class="hw-bar rounded-t"
+													style="height:86%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+											</div>
+											<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+													style="height:6%;background:var(--bg-2)"></span></div>
+											<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+													style="height:6%;background:var(--bg-2)"></span></div>
+											<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+													style="height:6%;background:var(--bg-2)"></span></div>
+											<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+													style="height:6%;background:var(--bg-2)"></span></div>
+											<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+													style="height:6%;background:var(--bg-2)"></span></div>
+											<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+													style="height:6%;background:var(--bg-2)"></span></div>
+										</div>
+										<div id="hw-labels"
+											class="flex gap-1.5 sm:gap-2 mt-1.5 text-[.58rem] text-center"
+											style="color:var(--muted)">
+											<span class="flex-1">Jan</span><span class="flex-1">Feb</span><span
+												class="flex-1">Mär</span><span class="flex-1">Apr</span><span
+												class="flex-1">Mai</span><span class="flex-1">Jun</span><span
+												class="flex-1">Jul</span><span class="flex-1">Aug</span><span
+												class="flex-1">Sep</span><span class="flex-1">Okt</span><span
+												class="flex-1">Nov</span><span class="flex-1">Dez</span>
+										</div>
+									</div>
+									<div class="mt-4 space-y-1.5 text-[.8rem]" style="color:var(--ink-2)">
+										<div class="flex items-start gap-2"><span
+												style="color:var(--brand)">⚡</span><span>1 offene Rechnung über <span
+													class="num">4.046,00 €</span> – Zahlungseingänge im Blick
+												behalten.</span></div>
+										<div class="flex items-start gap-2"><span
+												style="color:var(--brand)">⚡</span><span>Betrieblicher Gewinn <span
+													class="js-trend-word">über dem</span> Vormonat (<span
+													class="num js-profit-now">3.146 €</span> vs. <span
+													class="num js-profit-prev">2.746 €</span>).</span></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- trust pills -->
+				<div class="mt-9 flex flex-wrap items-center justify-center gap-2.5 text-[.8rem]">
+					<span class="pill rounded-full px-3.5 py-1.5">100&nbsp;% lokal</span>
+					<span class="pill rounded-full px-3.5 py-1.5">Kein Konto, kein Login</span>
+					<span class="pill rounded-full px-3.5 py-1.5">App-Sandbox aktiv</span>
+					<span class="pill rounded-full px-3.5 py-1.5">Source-available</span>
+					<span class="pill rounded-full px-3.5 py-1.5">Cent-genau mit <span class="num">Decimal</span></span>
+				</div>
+			</div>
+		</section>
+		<!-- ============ §3 FREI VERFÜGBAR (Signature) ============ -->
+		<section id="frei" class="py-24 sm:py-32" style="background:var(--bg-2)">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="max-w-3xl reveal">
+					<span class="eyebrow">Das Herzstück</span>
+					<h2
+						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Auf dem Konto liegen 6.000 €. Wie viel davon gehört wirklich <span
+							class="brand-text">dir</span>? </h2>
+					<p class="mt-6 text-[1.12rem] leading-relaxed" style="color:var(--ink-2)"> Genau das rechnet Kontor
+						– Monat für Monat als Wasserfall vom Brutto bis zur einzigen Zahl, die zählt. Keine Schätzung
+						aus dem Bauch, keine böse Überraschung am Quartalsende. </p>
+				</div>
+				<div class="mt-14 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+					<!-- the waterfall -->
+					<div class="reveal">
+						<div class="ui-hover rounded-2xl p-6 sm:p-8"
+							style="background:var(--surface);box-shadow:var(--shadow)">
+							<div class="flex items-center justify-between">
+								<span class="eyebrow normal-case tracking-[.05em]">Beispielrechnung · Monat</span>
+								<span class="num text-[.78rem]" style="color:var(--muted)">EUR</span>
+							</div>
+							<div class="mt-5 space-y-1 text-[1.02rem]">
+								<div class="wf-row flex items-center justify-between py-2.5 hairline border-b">
+									<span style="color:var(--ink-2)">Umsatz (brutto)</span>
+									<span class="num font-medium">6.000,00</span>
+								</div>
+								<div class="wf-row flex items-center justify-between py-2.5 hairline border-b">
+									<span style="color:var(--ink-2)">− Umsatzsteuer-Zahllast</span>
+									<span class="num" style="color:var(--neg)">−900,00</span>
+								</div>
+								<div class="wf-row flex items-center justify-between py-2.5 hairline border-b">
+									<span style="color:var(--ink-2)">+ Vorsteuer-Erstattung</span>
+									<span class="num" style="color:var(--pos)">+120,00</span>
+								</div>
+								<div class="wf-row flex items-center justify-between py-2.5 hairline border-b">
+									<span style="color:var(--ink-2)">− KSK-Beitrag</span>
+									<span class="num" style="color:var(--neg)">−420,00</span>
+								</div>
+								<div class="wf-row flex items-center justify-between py-2.5 hairline border-b">
+									<span style="color:var(--ink-2)">− Einkommensteuer-Rücklage</span>
+									<span class="num" style="color:var(--neg)">−560,00</span>
+								</div>
+								<div class="wf-row flex items-center justify-between py-2.5 hairline border-b">
+									<span style="color:var(--ink-2)">− Private Fixkosten</span>
+									<span class="num" style="color:var(--neg)">−1.300,00</span>
+								</div>
+								<div class="wf-row mt-3 rounded-xl px-4 py-4 flex items-center justify-between"
+									style="background:color-mix(in srgb,var(--pos) 12%,transparent)">
+									<span class="font-semibold" style="color:var(--ink)">= Frei verfügbar</span>
+									<span class="num text-[1.7rem] font-medium"
+										style="color:var(--pos)">2.940,00&nbsp;€</span>
+								</div>
+							</div>
+							<p class="mt-5 text-[.86rem] leading-relaxed" style="color:var(--muted)"> Kontor kennt deine
+								Soll-USt, deine KSK, deinen ESt-Satz und deine Rücklagen – und zeigt dir schwarz auf
+								weiß, was am Monatsende übrig bleibt. </p>
+						</div>
+					</div>
+					<!-- native rebuild · Auf Rücklagenkonto (komplementär zum Wasserfall) -->
+					<div class="reveal d1">
+						<div class="pan-x">
+							<div class="ui-card ui-hover p-5 sm:p-6">
+								<div class="flex items-center justify-between">
+									<div>
+										<div class="font-display text-[1.05rem] font-bold leading-none">Auf
+											Rücklagenkonto</div>
+										<div class="text-[.8rem] mt-1.5" style="color:var(--muted)">aus demselben Monat
+										</div>
+									</div>
+									<span class="eyebrow normal-case tracking-[.1em]">zurückgelegt</span>
+								</div>
+								<div class="mt-5">
+									<div class="ui-r flex items-center justify-between py-2.5">
+										<span class="flex items-center gap-2.5" style="color:var(--ink-2)"><span
+												class="w-2 h-2 rounded-full shrink-0"
+												style="background:var(--brand-blue)"></span>USt-Zahllast · ans
+											Finanzamt</span>
+										<span class="num">780,00 €</span>
+									</div>
+									<div class="ui-r flex items-center justify-between py-2.5"
+										style="border-top:1px solid var(--hair)">
+										<span class="flex items-center gap-2.5" style="color:var(--ink-2)"><span
+												class="w-2 h-2 rounded-full shrink-0"
+												style="background:var(--brand)"></span>Einkommensteuer-Rücklage</span>
+										<span class="num">560,00 €</span>
+									</div>
+									<div class="ui-r flex items-center justify-between py-2.5"
+										style="border-top:1px solid var(--hair)">
+										<span class="flex items-center gap-2.5" style="color:var(--ink-2)"><span
+												class="w-2 h-2 rounded-full shrink-0"
+												style="background:var(--brand-2)"></span>KSK-Beitrag</span>
+										<span class="num">420,00 €</span>
+									</div>
+								</div>
+								<div class="mt-3.5 h-2.5 rounded-full overflow-hidden flex gap-px"
+									title="USt / ESt / KSK">
+									<span class="block h-full" style="width:44.3%;background:var(--brand-blue)"></span>
+									<span class="block h-full" style="width:31.8%;background:var(--brand)"></span>
+									<span class="block h-full" style="width:23.9%;background:var(--brand-2)"></span>
+								</div>
+								<div class="mt-4 rounded-xl px-4 py-3 flex items-center justify-between"
+									style="background:color-mix(in srgb,var(--brand-2) 11%,transparent)">
+									<span class="font-semibold">= Summe Rücklage</span>
+									<span class="num text-[1.2rem] font-medium" style="color:var(--brand-2)">1.760,00
+										€</span>
+								</div>
+								<p class="mt-3 text-[.72rem] leading-relaxed" style="color:var(--muted)">Zurückgelegt,
+									nicht weg – für Finanzamt und KSK. Was bleibt: <span class="font-medium"
+										style="color:var(--pos)">2.940 € frei.</span></p>
+							</div>
+						</div>
+						<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug max-w-md text-balance">
+							Der Unterschied zwischen <span style="color:var(--muted)">„ich hab Geld auf dem
+								Konto“</span> und <span class="brand-text">„ich weiß, was mir gehört.“</span>
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- ============ ZWEI HANDGRIFFE · Belege OCR + Kontoauszug-Import ============ -->
+		<section id="alltag" class="py-24 sm:py-32">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="max-w-3xl reveal">
+					<span class="eyebrow">Dein Monat · zwei Handgriffe</span>
+					<h2
+						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Belege rein. Kontoauszug rein. <span class="brand-text">Fertig.</span>
+					</h2>
+					<p class="mt-6 text-[1.12rem] leading-relaxed" style="color:var(--ink-2)"> Der mühsamste Teil jeder
+						Buchhaltung ist die Dateneingabe. In Kontor sind es zwei Handgriffe im Monat – den Rest
+						erledigen OCR und ein CSV-Import. Für Einnahmen wie Ausgaben. </p>
+				</div>
+				<!-- Handgriff 1 · Belege + OCR -->
+				<div class="mt-16 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+					<div class="reveal">
+						<div class="flex items-center gap-3">
+							<span class="num grid place-items-center w-8 h-8 rounded-full text-[.9rem] font-bold"
+								style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">1</span>
+							<span class="eyebrow normal-case tracking-[.05em]">Belege &amp; OCR</span>
+						</div>
+						<h3 class="font-display text-[1.9rem] font-bold mt-4 leading-tight">Mehrere PDFs reinziehen –
+							erfasst.</h3>
+						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> Zieh beliebig viele PDFs oder Fotos
+							auf einmal hinein – egal ob Eingangs- oder Ausgangsbeleg. Die OCR (Apple Vision) liest
+							<strong style="color:var(--ink)">Datum, Betrag und Anbieter</strong> aus, hängt jeden Beleg
+							an den passenden Eintrag und legt fehlende gleich an. Kein Abtippen, kein Sortieren. </p>
+						<div class="mt-5 flex flex-wrap gap-2">
+							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Eingang &amp; Ausgang</span>
+							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Apple-Vision-OCR</span>
+							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Inline-Vorschau</span>
+						</div>
+					</div>
+					<!-- OCR mock -->
+					<div class="reveal d1">
+						<div class="ui-hover rounded-2xl p-5 sm:p-6"
+							style="background:var(--surface);box-shadow:var(--shadow)">
+							<div class="rounded-xl p-4 flex flex-wrap gap-2"
+								style="border:1px dashed color-mix(in srgb,var(--brand) 42%,var(--hair));background:color-mix(in srgb,var(--brand) 5%,transparent)">
+								<span class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[.8rem]"
+									style="background:var(--surface);border:1px solid var(--hair)"><svg
+										class="w-3.5 h-3.5" style="color:var(--brand)" viewBox="0 0 24 24" fill="none"
+										stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+										stroke-linejoin="round">
+										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+										<path d="M14 2v6h6" />
+									</svg>Figma_Rechnung.pdf</span>
+								<span class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[.8rem]"
+									style="background:var(--surface);border:1px solid var(--hair)"><svg
+										class="w-3.5 h-3.5" style="color:var(--brand)" viewBox="0 0 24 24" fill="none"
+										stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+										stroke-linejoin="round">
+										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+										<path d="M14 2v6h6" />
+									</svg>DB_Ticket.pdf</span>
+								<span class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[.8rem]"
+									style="background:var(--surface);border:1px solid var(--hair)"><svg
+										class="w-3.5 h-3.5" style="color:var(--brand)" viewBox="0 0 24 24" fill="none"
+										stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+										stroke-linejoin="round">
+										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+										<path d="M14 2v6h6" />
+									</svg>Hotel_Beleg.pdf</span>
+								<span class="inline-flex items-center rounded-lg px-2.5 py-1.5 text-[.8rem]"
+									style="color:var(--muted)">+4 weitere …</span>
+							</div>
+							<div class="flex items-center justify-center gap-2 my-3 text-[.82rem]"
+								style="color:var(--muted)">
+								<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+									stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M12 5v14M19 12l-7 7-7-7" />
+								</svg> OCR liest aus
+							</div>
+							<div class="rounded-xl p-4 space-y-2.5 text-[.95rem]"
+								style="background:var(--surface-2);border:1px solid var(--hair)">
+								<div class="flex items-center justify-between">
+									<span style="color:var(--muted)">Anbieter</span>
+									<span class="flex items-center gap-2"><span class="font-medium"
+											style="color:var(--ink)">Figma Inc.</span><span
+											class="rounded px-1.5 py-0.5 text-[.64rem] font-semibold"
+											style="background:color-mix(in srgb,var(--pos) 16%,transparent);color:var(--pos)">erkannt</span></span>
+								</div>
+								<div class="flex items-center justify-between">
+									<span style="color:var(--muted)">Datum</span>
+									<span class="flex items-center gap-2"><span class="num font-medium js-date"
+											data-day="14" data-fmt="full"
+											style="color:var(--ink)">14.06.2026</span><span
+											class="rounded px-1.5 py-0.5 text-[.64rem] font-semibold"
+											style="background:color-mix(in srgb,var(--pos) 16%,transparent);color:var(--pos)">erkannt</span></span>
+								</div>
+								<div class="flex items-center justify-between">
+									<span style="color:var(--muted)">Betrag (brutto)</span>
+									<span class="flex items-center gap-2"><span class="num font-medium"
+											style="color:var(--ink)">18,00 €</span><span
+											class="rounded px-1.5 py-0.5 text-[.64rem] font-semibold"
+											style="background:color-mix(in srgb,var(--pos) 16%,transparent);color:var(--pos)">erkannt</span></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Handgriff 2 · Kontoauszug-Import -->
+				<div class="mt-20 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+					<!-- native rebuild · Kontoauszug-Triage (interaktiv) -->
+					<div class="reveal pan-x order-2 lg:order-1">
+						<div class="ui-card ui-hover p-4 sm:p-5">
+							<div class="flex items-center justify-between gap-3">
+								<span
+									class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[.78rem] min-w-0"
+									style="background:var(--surface-2);border:1px solid var(--hair)">
+									<svg class="w-3.5 h-3.5 shrink-0" style="color:var(--brand)" viewBox="0 0 24 24"
+										fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+										stroke-linejoin="round">
+										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+										<path d="M14 2v6h6" />
+									</svg>
+									<span class="truncate">Sparkasse_<span class="js-month">Juni</span>.csv</span>
+								</span>
+								<button class="kt-bookall text-[.78rem] font-semibold shrink-0 hover:opacity-70"
+									style="color:var(--brand)">Alle buchen</button>
+							</div>
+							<div class="mt-2 text-[.74rem]" style="color:var(--muted)"><span
+									class="kt-open num">4</span> offen · <span class="num">4</span> Buchungen geladen ·
+								CSV-CAMT</div>
+							<div class="mt-3 space-y-2">
+								<!-- row 1 -->
+								<div class="kt-row ui-r flex items-center gap-3 rounded-xl p-3"
+									style="background:var(--surface-2);border:1px solid var(--hair)">
+									<div class="min-w-0 flex-1">
+										<div class="font-medium truncate text-[.92rem]">Kranzler Digital GmbH</div>
+										<div class="text-[.72rem] truncate mt-0.5" style="color:var(--muted)"><span
+												class="js-date" data-day="12" data-fmt="short">12.06.</span> ·
+											Gutschrift</div>
+									</div>
+									<div class="text-right shrink-0">
+										<div class="num font-medium text-[.92rem]" style="color:var(--pos)">+4.046,00 €
+										</div>
+										<span class="inline-block rounded px-1.5 py-0.5 text-[.65rem] font-medium mt-1"
+											style="background:color-mix(in srgb,var(--pos) 14%,transparent);color:var(--pos)">Zahlungseingang</span>
+									</div>
+									<div class="kt-actions flex items-center gap-1.5 shrink-0">
+										<button class="kt-book rounded-lg px-3 h-8 text-[.76rem] font-semibold"
+											style="background:color-mix(in srgb,var(--brand) 15%,transparent);color:var(--brand)">Überschreiben</button>
+										<button class="kt-skip grid place-items-center w-8 h-8 rounded-lg"
+											style="border:1px solid var(--hair);color:var(--muted)"
+											aria-label="Überspringen"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24"
+												fill="none" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round" stroke-linejoin="round">
+												<path d="M18 6L6 18M6 6l12 12" />
+											</svg></button>
+									</div>
+									<span class="kt-status items-center gap-1.5 text-[.82rem] font-semibold shrink-0"
+										style="color:var(--pos)"></span>
+								</div>
+								<!-- row 2 -->
+								<div class="kt-row ui-r flex items-center gap-3 rounded-xl p-3"
+									style="background:var(--surface-2);border:1px solid var(--hair)">
+									<div class="min-w-0 flex-1">
+										<div class="font-medium truncate text-[.92rem]">Anthropic · Claude</div>
+										<div class="text-[.72rem] truncate mt-0.5" style="color:var(--muted)"><span
+												class="js-date" data-day="10" data-fmt="short">10.06.</span> ·
+											Kartenzahlung</div>
+									</div>
+									<div class="text-right shrink-0">
+										<div class="num font-medium text-[.92rem]">−18,00 €</div>
+										<span class="inline-block rounded px-1.5 py-0.5 text-[.65rem] font-medium mt-1"
+											style="background:var(--bg-2);color:var(--muted);border:1px solid var(--hair)">Betriebsausgabe
+											· §13b</span>
+									</div>
+									<div class="kt-actions flex items-center gap-1.5 shrink-0">
+										<button class="kt-book rounded-lg px-3 h-8 text-[.76rem] font-semibold"
+											style="background:color-mix(in srgb,var(--brand) 15%,transparent);color:var(--brand)">Überschreiben</button>
+										<button class="kt-skip grid place-items-center w-8 h-8 rounded-lg"
+											style="border:1px solid var(--hair);color:var(--muted)"
+											aria-label="Überspringen"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24"
+												fill="none" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round" stroke-linejoin="round">
+												<path d="M18 6L6 18M6 6l12 12" />
+											</svg></button>
+									</div>
+									<span class="kt-status items-center gap-1.5 text-[.82rem] font-semibold shrink-0"
+										style="color:var(--pos)"></span>
+								</div>
+								<!-- row 3 -->
+								<div class="kt-row ui-r flex items-center gap-3 rounded-xl p-3"
+									style="background:var(--surface-2);border:1px solid var(--hair)">
+									<div class="min-w-0 flex-1">
+										<div class="font-medium truncate text-[.92rem]">Biomarkt Nord</div>
+										<div class="text-[.72rem] truncate mt-0.5" style="color:var(--muted)"><span
+												class="js-date" data-day="8" data-fmt="short">08.06.</span> ·
+											Kartenzahlung</div>
+									</div>
+									<div class="text-right shrink-0">
+										<div class="num font-medium text-[.92rem]">−62,50 €</div>
+										<span class="inline-block rounded px-1.5 py-0.5 text-[.65rem] font-medium mt-1"
+											style="background:var(--bg-2);color:var(--muted);border:1px solid var(--hair)">Lebensmittel
+											· privat</span>
+									</div>
+									<div class="kt-actions flex items-center gap-1.5 shrink-0">
+										<button class="kt-book rounded-lg px-3 h-8 text-[.76rem] font-semibold"
+											style="background:color-mix(in srgb,var(--brand) 15%,transparent);color:var(--brand)">Buchen</button>
+										<button class="kt-skip grid place-items-center w-8 h-8 rounded-lg"
+											style="border:1px solid var(--hair);color:var(--muted)"
+											aria-label="Überspringen"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24"
+												fill="none" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round" stroke-linejoin="round">
+												<path d="M18 6L6 18M6 6l12 12" />
+											</svg></button>
+									</div>
+									<span class="kt-status items-center gap-1.5 text-[.82rem] font-semibold shrink-0"
+										style="color:var(--pos)"></span>
+								</div>
+								<!-- row 4 -->
+								<div class="kt-row ui-r flex items-center gap-3 rounded-xl p-3"
+									style="background:var(--surface-2);border:1px solid var(--hair)">
+									<div class="min-w-0 flex-1">
+										<div class="font-medium truncate text-[.92rem]">Künstlersozialkasse</div>
+										<div class="text-[.72rem] truncate mt-0.5" style="color:var(--muted)"><span
+												class="js-date" data-day="1" data-fmt="short">01.06.</span> ·
+											Lastschrift</div>
+									</div>
+									<div class="text-right shrink-0">
+										<div class="num font-medium text-[.92rem]">−420,00 €</div>
+										<span class="inline-block rounded px-1.5 py-0.5 text-[.65rem] font-medium mt-1"
+											style="background:var(--bg-2);color:var(--muted);border:1px solid var(--hair)">KSK
+											· Vorsorge</span>
+									</div>
+									<div class="kt-actions flex items-center gap-1.5 shrink-0">
+										<button class="kt-book rounded-lg px-3 h-8 text-[.76rem] font-semibold"
+											style="background:color-mix(in srgb,var(--brand) 15%,transparent);color:var(--brand)">Buchen</button>
+										<button class="kt-skip grid place-items-center w-8 h-8 rounded-lg"
+											style="border:1px solid var(--hair);color:var(--muted)"
+											aria-label="Überspringen"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24"
+												fill="none" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round" stroke-linejoin="round">
+												<path d="M18 6L6 18M6 6l12 12" />
+											</svg></button>
+									</div>
+									<span class="kt-status items-center gap-1.5 text-[.82rem] font-semibold shrink-0"
+										style="color:var(--pos)"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="reveal d1 order-1 lg:order-2">
+						<div class="flex items-center gap-3">
+							<span class="num grid place-items-center w-8 h-8 rounded-full text-[.9rem] font-bold"
+								style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">2</span>
+							<span class="eyebrow normal-case tracking-[.05em]">Kontoauszug-Abgleich</span>
+						</div>
+						<h3 class="font-display text-[1.9rem] font-bold mt-4 leading-tight">Einmal im Monat: CSV
+							importieren.</h3>
+						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> Lade den CSV-Export (CAMT) deiner
+							Sparkasse hoch. Kontor ordnet jede Buchung zu und lernt deine Händler und Gläubiger. Schon
+							vorhandene Einträge erkennt es wieder und aktualisiert nur <strong
+								style="color:var(--ink)">Status und Zahldatum</strong> – nichts doppelt, nichts von
+							Hand. </p>
+						<div class="mt-5 flex flex-wrap gap-2">
+							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Sparkasse · CSV-CAMT</span>
+							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Lernt Händler &amp; Gläubiger</span>
+							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Idempotent · kein Doppelimport</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- ============ §1 PROBLEM ============ -->
+		<section id="problem" class="py-24 sm:py-32">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="max-w-3xl reveal">
+					<span class="eyebrow">Der Schmerz</span>
+					<h2
+						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Dieselbe Rechnung, zwei Wahrheiten. </h2>
+					<p class="mt-6 text-[1.12rem] leading-relaxed" style="color:var(--ink-2)"> Tabellenkalkulation am
+						Quartalsende. Steuer-Tools, die alles können – nur nicht <em>deinen</em> Fall. Cloud-Dienste,
+						die deine Umsätze auf fremden Servern parken. Wenn du freiberuflich arbeitest, KSK-versichert
+						bist, deine EÜR selbst machst und quartalsweise eine UStVA abgibst, kennst du das: </p>
+				</div>
+				<div class="mt-12 grid md:grid-cols-3 gap-5">
+					<div class="reveal rounded-2xl p-7" style="background:var(--surface);border:1px solid var(--hair)">
+						<div class="num text-[.8rem]" style="color:var(--brand)">01</div>
+						<p class="mt-3 leading-relaxed" style="color:var(--ink-2)"> Die USt richtet sich nach dem
+							<strong style="color:var(--ink)">Rechnungsdatum</strong>, dein Gewinn nach dem <strong
+								style="color:var(--ink)">Zahlungseingang</strong> – dieselbe Rechnung, zwei Wahrheiten.
+							Kein Tool denkt das mit. </p>
+					</div>
+					<div class="reveal d1 rounded-2xl p-7"
+						style="background:var(--surface);border:1px solid var(--hair)">
+						<div class="num text-[.8rem]" style="color:var(--brand)">02</div>
+						<p class="mt-3 leading-relaxed" style="color:var(--ink-2)">
+							<strong style="color:var(--ink)">Reverse-Charge</strong>, <strong
+								style="color:var(--ink)">Forderungsausfall</strong>, <strong
+								style="color:var(--ink)">KSK-Beitrag</strong>, <strong
+								style="color:var(--ink)">ESt-Rücklage</strong> – Sonderfälle, die Standard-Software
+							ignoriert oder hinter 200 Buchungskonten versteckt.
+						</p>
+					</div>
+					<div class="reveal d2 rounded-2xl p-7"
+						style="background:var(--surface);border:1px solid var(--hair)">
+						<div class="num text-[.8rem]" style="color:var(--brand)">03</div>
+						<p class="mt-3 leading-relaxed" style="color:var(--ink-2)"> Und am Ende tippst du die Zahlen
+							doch wieder von Hand ins <strong style="color:var(--ink)">ELSTER-Formular</strong>. </p>
+					</div>
+				</div>
+				<p
+					class="reveal mt-12 font-display text-[clamp(1.4rem,2.6vw,2rem)] font-semibold leading-snug max-w-3xl text-balance">
+					Kontor ist für den einen Menschen gebaut, den die großen Tools vergessen: <span
+						class="brand-text">dich</span>. </p>
+			</div>
+		</section>
+		<!-- ============ §2 DREI VERSPRECHEN ============ -->
+		<section class="py-12 sm:py-16">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="grid md:grid-cols-3 gap-5">
+					<!-- card 1 -->
+					<div class="reveal rounded-2xl p-8"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<div class="grid place-items-center w-12 h-12 rounded-xl"
+							style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">
+							<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="4" y="2" width="16" height="20" rx="2" />
+								<path d="M8 6h8M8 10h2M8 14h2M8 18h2M14 10h2v8h-2z" />
+							</svg>
+						</div>
+						<h3 class="font-display text-[1.5rem] font-bold mt-5">Rechnet steuerlich richtig</h3>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)"> Nicht „auch Buchhaltung“, sondern
+							<strong style="color:var(--ink-2)">deine</strong>: Soll-Versteuerung, Zuflussprinzip, §13b,
+							§17, KSK, pauschale ESt-Rücklage. Die Logik steckt in einer getesteten Engine – Schritt für
+							Schritt gegen nachrechenbare Werte geprüft. </p>
+					</div>
+					<!-- card 2 -->
+					<div class="reveal d1 rounded-2xl p-8"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<div class="grid place-items-center w-12 h-12 rounded-xl"
+							style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">
+							<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="4" y="11" width="16" height="10" rx="2" />
+								<path d="M8 11V7a4 4 0 0 1 8 0v4" />
+							</svg>
+						</div>
+						<h3 class="font-display text-[1.5rem] font-bold mt-5">Bleibt bei dir</h3>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">
+							<strong style="color:var(--ink-2)">Local-first, offline, Sandbox an.</strong> Deine Umsätze
+							verlassen den Mac nicht. Kein Konto, kein Login, kein Tracking. Backup liegt als Datei in
+							deinem Ordner – nicht in fremder Hand.
+						</p>
+					</div>
+					<!-- card 3 -->
+					<div class="reveal d2 rounded-2xl p-8"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<div class="grid place-items-center w-12 h-12 rounded-xl"
+							style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">
+							<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15l-1.9-4.1L5.5 9l4.6-1.4z" />
+								<path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
+							</svg>
+						</div>
+						<h3 class="font-display text-[1.5rem] font-bold mt-5">Fühlt sich leicht an</h3>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)"> Native macOS-App in SwiftUI.
+							Schnell, ruhig, aufgeräumt. Inline bearbeiten, ein Klick zum Duplizieren, ein Klick zum
+							Abschluss. Buchhaltung, die sich nicht wie Strafe anfühlt. </p>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- ============ §4 WAS KONTOR BESONDERS MACHT ============ -->
+		<section id="besonders" class="py-24 sm:py-32">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="max-w-3xl reveal">
+					<span class="eyebrow">Besonderheiten</span>
+					<h2
+						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Die Sonderfälle, die sonst niemand kann. </h2>
+				</div>
+				<!-- feature row: KSK -->
+				<div class="mt-16 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+					<div class="reveal order-2 lg:order-1">
+						<span class="eyebrow normal-case tracking-[.05em]">Künstlersozialkasse</span>
+						<h3 class="font-display text-[1.9rem] font-bold mt-4 leading-tight">Endlich mitgedacht.</h3>
+						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> KSK je Monat als drei Beträge
+							<strong style="color:var(--ink)">KV / RV / PV</strong> – in der Reihenfolge deines
+							Bescheids. Direkt im Monatsabschluss gepflegt und automatisch vom Vormonat geerbt: einmal
+							eintragen, gilt fort. Der Monatswert ist die Soll-Quelle für Rücklage und Jahres-KSK; die
+							tatsächliche Abbuchung liegt als <strong style="color:var(--ink)">Ist</strong> im
+							Zahlungs-Ledger. </p>
+					</div>
+					<!-- native rebuild · KSK-Werte-Inspektor -->
+					<div class="reveal pan-x d1 order-1 lg:order-2">
+						<div class="ui-card ui-hover p-5 sm:p-6 w-full max-w-md mx-auto lg:mr-0">
+							<div class="flex items-center justify-between">
+								<div>
+									<div class="font-display text-[1.05rem] font-bold leading-none">Monatswerte</div>
+									<div class="text-[.8rem] mt-1.5" style="color:var(--muted)"><span
+											class="js-month">Juni</span> <span class="js-year">2026</span></div>
+								</div>
+								<div class="flex items-center gap-1 p-1 rounded-[10px]" style="background:var(--bg-2)">
+									<span class="ui-tab on">Werte</span><span class="ui-tab">Aufgaben</span>
+								</div>
+							</div>
+							<div class="eyebrow normal-case tracking-[.1em] mt-6">KSK-Beitrag</div>
+							<div class="mt-2.5">
+								<div class="ui-r flex items-center justify-between py-2 text-[.8rem]"
+									style="color:var(--muted)">
+									<span>JAE · nur zur Orientierung</span>
+									<span class="num">36.000,00 €</span>
+								</div>
+								<div class="ui-r flex items-center justify-between py-2.5"
+									style="border-top:1px solid var(--hair)">
+									<span class="flex items-center gap-2.5" style="color:var(--ink-2)"><span
+											class="w-2 h-2 rounded-full shrink-0"
+											style="background:var(--brand-blue)"></span>RV · Rentenversicherung</span>
+									<span class="num copyable px-1.5 py-0.5">230,00 €</span>
+								</div>
+								<div class="ui-r flex items-center justify-between py-2.5"
+									style="border-top:1px solid var(--hair)">
+									<span class="flex items-center gap-2.5" style="color:var(--ink-2)"><span
+											class="w-2 h-2 rounded-full shrink-0"
+											style="background:var(--brand)"></span>KV · Krankenversicherung</span>
+									<span class="num copyable px-1.5 py-0.5">130,00 €</span>
+								</div>
+								<div class="ui-r flex items-center justify-between py-2.5"
+									style="border-top:1px solid var(--hair)">
+									<span class="flex items-center gap-2.5" style="color:var(--ink-2)"><span
+											class="w-2 h-2 rounded-full shrink-0"
+											style="background:var(--brand-2)"></span>PV · Pflegeversicherung</span>
+									<span class="num copyable px-1.5 py-0.5">60,00 €</span>
+								</div>
+							</div>
+							<div class="mt-3.5 h-2.5 rounded-full overflow-hidden flex gap-px" title="RV / KV / PV">
+								<span class="block h-full" style="width:54.8%;background:var(--brand-blue)"></span>
+								<span class="block h-full" style="width:31%;background:var(--brand)"></span>
+								<span class="block h-full" style="width:14.2%;background:var(--brand-2)"></span>
+							</div>
+							<div class="mt-4 rounded-xl px-4 py-3 flex items-center justify-between"
+								style="background:color-mix(in srgb,var(--brand) 9%,transparent)">
+								<span class="font-semibold">= Monatsbeitrag</span>
+								<span class="num text-[1.2rem] font-medium" style="color:var(--brand)">420,00 €</span>
+							</div>
+							<div class="mt-4 pt-4 flex items-center justify-between"
+								style="border-top:1px solid var(--hair)">
+								<span class="eyebrow normal-case tracking-[.1em]">ESt-Satz · pauschal</span>
+								<span class="num font-semibold">15 %</span>
+							</div>
+							<p class="mt-3 text-[.72rem] leading-relaxed" style="color:var(--muted)">Werte vom Vormonat
+								geerbt – einmal eintragen, gilt fort.</p>
+						</div>
+					</div>
+				</div>
+				<!-- feature row: UStVA -->
+				<div class="mt-20 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+					<!-- native rebuild · UStVA-Kennzahlen (kopierbar) -->
+					<div class="reveal pan-x">
+						<div class="ui-card ui-hover p-5 sm:p-6 w-full max-w-md mx-auto lg:ml-0">
+							<div class="flex items-center justify-between">
+								<div>
+									<div class="font-display text-[1.05rem] font-bold leading-none">USt-Voranmeldung
+									</div>
+									<div class="text-[.8rem] mt-1.5" style="color:var(--muted)"><span
+											class="js-quarter">Q2</span> · <span class="js-year">2026</span> ·
+										Kennzahlen nach ELSTER</div>
+								</div>
+								<div class="flex items-center gap-1 p-1 rounded-[10px]" style="background:var(--bg-2)">
+									<span class="ui-tab on">Quartal</span><span class="ui-tab">Monat</span>
+								</div>
+							</div>
+							<div class="eyebrow normal-case tracking-[.1em] mt-6">Umsätze · geschuldete USt</div>
+							<div class="mt-2">
+								<div class="ui-r flex items-center justify-between gap-3 py-2.5">
+									<span class="flex items-center gap-2.5 min-w-0"><span
+											class="kz">KZ&nbsp;81</span><span class="truncate"
+											style="color:var(--ink-2)">Steuerpflichtige Umsätze 19 %</span></span>
+									<span class="num copyable px-1.5 py-0.5 shrink-0 font-medium">10.000,00 €</span>
+								</div>
+								<div class="flex items-center justify-between pl-[3.4rem] pb-1.5 text-[.78rem]"
+									style="color:var(--muted)">
+									<span>darauf USt 19 %</span><span class="num">1.900,00 €</span>
+								</div>
+								<div class="ui-r flex items-center justify-between gap-3 py-2.5"
+									style="border-top:1px solid var(--hair)">
+									<span class="flex items-center gap-2.5 min-w-0"><span
+											class="kz">KZ&nbsp;84</span><span class="truncate"
+											style="color:var(--ink-2)">§13b Reverse-Charge (netto)</span></span>
+									<span class="num copyable px-1.5 py-0.5 shrink-0 font-medium">132,00 €</span>
+								</div>
+								<div class="ui-r flex items-center justify-between gap-3 py-2.5"
+									style="border-top:1px solid var(--hair)">
+									<span class="flex items-center gap-2.5 min-w-0"><span
+											class="kz">KZ&nbsp;85</span><span class="truncate"
+											style="color:var(--ink-2)">§13b · USt 19 %</span></span>
+									<span class="num copyable px-1.5 py-0.5 shrink-0 font-medium">25,08 €</span>
+								</div>
+							</div>
+							<div class="eyebrow normal-case tracking-[.1em] mt-4">Vorsteuer · abziehbar</div>
+							<div class="mt-2">
+								<div class="ui-r flex items-center justify-between gap-3 py-2.5">
+									<span class="flex items-center gap-2.5 min-w-0"><span
+											class="kz">KZ&nbsp;66</span><span class="truncate"
+											style="color:var(--ink-2)">Vorsteuer Inland</span></span>
+									<span class="num copyable px-1.5 py-0.5 shrink-0 font-medium">119,70 €</span>
+								</div>
+								<div class="ui-r flex items-center justify-between gap-3 py-2.5"
+									style="border-top:1px solid var(--hair)">
+									<span class="flex items-center gap-2.5 min-w-0"><span
+											class="kz">KZ&nbsp;67</span><span class="truncate"
+											style="color:var(--ink-2)">Vorsteuer aus §13b</span></span>
+									<span class="num copyable px-1.5 py-0.5 shrink-0 font-medium">25,08 €</span>
+								</div>
+							</div>
+							<div class="mt-4 rounded-xl px-4 py-3.5 flex items-center justify-between gap-3"
+								style="background:color-mix(in srgb,var(--brand-2) 12%,transparent)">
+								<span class="flex items-center gap-2.5 min-w-0"><span class="kz"
+										style="background:color-mix(in srgb,var(--brand-2) 20%,transparent);color:var(--brand-2)">KZ&nbsp;83</span><span
+										class="font-semibold truncate">USt-Vorauszahlung</span></span>
+								<span class="num copyable px-1.5 py-0.5 shrink-0 text-[1.15rem] font-medium"
+									style="color:var(--brand-2)">1.780,30 €</span>
+							</div>
+							<p class="mt-3 text-[.72rem] leading-relaxed" style="color:var(--muted)">Klick auf eine Zahl
+								kopiert sie – direkt ins ELSTER-Formular.</p>
+						</div>
+					</div>
+					<div class="reveal d1">
+						<span class="eyebrow normal-case tracking-[.05em]">Umsatzsteuer-Voranmeldung</span>
+						<h3 class="font-display text-[1.9rem] font-bold mt-4 leading-tight">Zum Abtippen –
+							formular-getreu nach ELSTER.</h3>
+						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> Keine kryptischen Summen, sondern
+							exakt die Kennzahlen, die im Formular stehen – mit Klartext-Label und Erklärung je Zeile.
+							Voranmeldung wird Abschreiben. </p>
+						<div class="mt-5 flex flex-wrap gap-2">
+							<span class="pill num rounded-lg px-2.5 py-1 text-[.78rem]">KZ&nbsp;81 · Bemessung</span>
+							<span class="pill num rounded-lg px-2.5 py-1 text-[.78rem]">KZ&nbsp;66 · Vorsteuer</span>
+							<span class="pill num rounded-lg px-2.5 py-1 text-[.78rem]">KZ&nbsp;84/85 · §13b</span>
+							<span class="pill num rounded-lg px-2.5 py-1 text-[.78rem]">KZ&nbsp;67</span>
+							<span class="pill num rounded-lg px-2.5 py-1 text-[.78rem]">KZ&nbsp;83 · Zahllast</span>
+						</div>
+					</div>
+				</div>
+				<!-- three cards: §13b, Rücklagen, §17 -->
+				<div class="mt-20 grid md:grid-cols-3 gap-5">
+					<div class="reveal rounded-2xl p-7"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<span class="eyebrow normal-case tracking-[.06em]">§ 13b</span>
+						<h3 class="font-display text-[1.35rem] font-bold mt-3">Reverse-Charge, das stimmt</h3>
+						<p class="mt-3 leading-relaxed text-[.97rem]" style="color:var(--muted)"> Auslands-Tools (Figma,
+							ChatGPT &amp; Co.) nach §13b: USt in KZ&nbsp;84/85, zugleich als Vorsteuer abziehbar →
+							<strong style="color:var(--ink-2)">cash-neutral</strong>. Der Netto-Betrag bleibt eine echte
+							Betriebsausgabe in der EÜR. </p>
+					</div>
+					<div class="reveal d1 rounded-2xl p-7"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<span class="eyebrow normal-case tracking-[.06em]">Rücklagen</span>
+						<h3 class="font-display text-[1.35rem] font-bold mt-3">Die du verstehst</h3>
+						<p class="mt-3 leading-relaxed text-[.97rem]" style="color:var(--muted)"> ESt-Rücklage pauschal
+							<span class="num">(Gewinn − KSK) × Satz</span> – bewusst grob, eher konservativ. Der Satz
+							ist <strong style="color:var(--ink-2)">monatlich justierbar</strong> (z.&nbsp;B. ab Februar
+							15&nbsp;%), ohne abgeschlossene Monate anzufassen. </p>
+					</div>
+					<div class="reveal d2 rounded-2xl p-7"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<span class="eyebrow normal-case tracking-[.06em]">§ 17</span>
+						<h3 class="font-display text-[1.35rem] font-bold mt-3">Forderungsausfall</h3>
+						<p class="mt-3 leading-relaxed text-[.97rem]" style="color:var(--muted)"> Wird eine Rechnung
+							uneinbringlich, korrigiert Kontor die USt <strong style="color:var(--ink-2)">und</strong>
+							löst die ESt-Rücklage auf – im richtigen Monat. Abgeschlossene Perioden bleiben unberührt.
+						</p>
+					</div>
+				</div>
+				<!-- MCP / KI highlight -->
+				<div class="reveal mt-16 rounded-3xl overflow-hidden"
+					style="border:1px solid var(--hair);background:linear-gradient(140deg,color-mix(in srgb,var(--brand-blue) 12%,var(--surface)),color-mix(in srgb,var(--brand-2) 14%,var(--surface)))">
+					<div class="grid lg:grid-cols-2 gap-8 p-8 sm:p-12 items-center">
+						<div>
+							<span class="eyebrow normal-case tracking-[.05em]">Lokaler MCP-Server</span>
+							<h3 class="font-display text-[1.9rem] font-bold mt-4 leading-tight">Frag deine Buchhaltung.
+							</h3>
+							<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> Schalt den mitgelieferten
+								MCP-Server ein, verbinde Claude – und frag in normaler Sprache. Lesen über alle Module,
+								sparsames Schreiben inklusive. Alles nur lokal auf <span class="num">127.0.0.1</span>,
+								Token in der Keychain, automatisches Backup vor dem ersten Schreibzugriff. </p>
+							<p class="mt-4 font-medium" style="color:var(--ink)">Deine KI sieht deine Zahlen. Das
+								Internet nie.</p>
+						</div>
+						<!-- mock chat -->
+						<div class="ui-hover rounded-2xl p-5 sm:p-6"
+							style="background:var(--surface);box-shadow:var(--shadow)">
+							<div class="flex items-center gap-2 pb-4 mb-4 hairline border-b">
+								<span class="w-2.5 h-2.5 rounded-full" style="background:var(--pos)"></span>
+								<span class="num text-[.76rem]" style="color:var(--muted)">kontor · mcp ·
+									verbunden</span>
+							</div>
+							<div class="space-y-3 text-[.95rem]">
+								<div class="ml-auto max-w-[85%] rounded-2xl rounded-br-md px-4 py-2.5 btn-primary"> Wie
+									hoch ist meine Zahllast für <span class="js-quarter">Q1</span>? </div>
+								<div class="mr-auto max-w-[88%] rounded-2xl rounded-bl-md px-4 py-3"
+									style="background:var(--surface-2);border:1px solid var(--hair)"> Deine
+									USt-Vorauszahlung für <span class="js-quarter">Q1</span> <span
+										class="js-year">2026</span> beträgt <span class="num font-medium"
+										style="color:var(--ink)">1.780,30&nbsp;€</span> (KZ&nbsp;83). Fällig nach
+									Quartalsende. </div>
+								<div class="mr-auto max-w-[70%] rounded-2xl rounded-bl-md px-4 py-2.5 text-[.85rem]"
+									style="background:var(--surface-2);border:1px solid var(--hair);color:var(--muted)">
+									Quelle: UStVA · lokal gelesen </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- ============ §5 ALLES AN BORD ============ -->
+		<section id="anbord" class="py-24 sm:py-32" style="background:var(--bg-2)">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="max-w-3xl reveal">
+					<span class="eyebrow">Alles an Bord</span>
+					<h2
+						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Kein Prototyp. Fertig. </h2>
+					<p class="mt-6 text-[1.12rem] leading-relaxed" style="color:var(--ink-2)"> Auswertungen in drei
+						Zeithorizonten, ein Ledger für alle Abflüsse, Banking-Import mit Triage, Belege mit OCR – und
+						ein sanfter Einstieg mit Demodaten. </p>
+				</div>
+				<!-- three horizons -->
+				<div class="mt-12 grid md:grid-cols-3 gap-5">
+					<div class="reveal rounded-2xl p-6" style="background:var(--surface);border:1px solid var(--hair)">
+						<h3 class="font-display text-[1.2rem] font-bold">Monatsabschluss</h3>
+						<p class="mt-2 text-[.95rem] leading-relaxed" style="color:var(--muted)">Gewinn-Wasserfall,
+							Rücklagenkonto inkl. §17-Korrektur. „Monat abschließen“ friert den Stand als Snapshot ein.
+						</p>
+					</div>
+					<div class="reveal d1 rounded-2xl p-6"
+						style="background:var(--surface);border:1px solid var(--hair)">
+						<h3 class="font-display text-[1.2rem] font-bold">UStVA</h3>
+						<p class="mt-2 text-[.95rem] leading-relaxed" style="color:var(--muted)">Pro Quartal oder Monat,
+							formular-getreu nach ELSTER – jede Kennzahl per Klick kopierbar.</p>
+					</div>
+					<div class="reveal d2 rounded-2xl p-6"
+						style="background:var(--surface);border:1px solid var(--hair)">
+						<h3 class="font-display text-[1.2rem] font-bold">Jahresabschluss (EÜR)</h3>
+						<p class="mt-2 text-[.95rem] leading-relaxed" style="color:var(--muted)">Einnahmen nach Zufluss,
+							Ausgaben nach Kategorie, Gewinn, Steuerlast, KSK-Jahr (KV/RV/PV), ESt-Abgleich.</p>
+					</div>
+				</div>
+				<!-- feature row: Ausgaben Ledger -->
+				<div class="mt-20 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+					<!-- native rebuild · Ausgaben-Ledger -->
+					<div class="reveal pan-x order-2 lg:order-1">
+						<div class="ui-card ui-hover p-4 sm:p-5">
+							<div class="flex items-center justify-between gap-3">
+								<div>
+									<div class="font-display text-[1.05rem] font-bold leading-none">Ausgaben</div>
+									<div class="text-[.8rem] mt-1.5" style="color:var(--muted)"><span
+											class="js-month">Juni</span> <span class="js-year">2026</span> · alle
+										Abflüsse</div>
+								</div>
+								<div class="flex items-center gap-1 p-1 rounded-[10px]" style="background:var(--bg-2)">
+									<span class="ui-tab on">Alle</span><span class="ui-tab">Privat</span><span
+										class="ui-tab">Betrieblich</span>
+								</div>
+							</div>
+							<div class="mt-4 flex flex-wrap gap-1.5 text-[.72rem] font-medium">
+								<span class="rounded-full px-2.5 py-1"
+									style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">Alle</span>
+								<span class="pill rounded-full px-2.5 py-1">Fixkosten</span>
+								<span class="pill rounded-full px-2.5 py-1">Subscriptions</span>
+								<span class="pill rounded-full px-2.5 py-1">Vorsorge</span>
+								<span class="pill rounded-full px-2.5 py-1">Steuern</span>
+							</div>
+							<div class="mt-2">
+								<div class="ui-r flex items-center gap-3 py-2.5">
+									<div class="min-w-0 flex-1">
+										<div class="flex items-center gap-2"><span class="font-medium truncate">Adobe
+												Creative Cloud</span><span
+												class="text-[.6rem] rounded px-1.5 py-0.5 font-medium shrink-0"
+												style="background:color-mix(in srgb,var(--brand) 13%,transparent);color:var(--brand)">betrieblich</span>
+										</div>
+										<div class="text-[.72rem] mt-0.5" style="color:var(--muted)">Subscription ·
+											<span class="js-date" data-day="1" data-fmt="short">01.06.</span></div>
+									</div>
+									<div class="text-right shrink-0">
+										<div class="num font-medium">71,40 €</div>
+										<div class="text-[.66rem] mt-0.5" style="color:var(--muted)">VSt 11,40 · netto
+											60,00</div>
+									</div>
+								</div>
+								<div class="ui-r flex items-center gap-3 py-2.5"
+									style="border-top:1px solid var(--hair)">
+									<div class="min-w-0 flex-1">
+										<div class="flex items-center gap-2"><span
+												class="font-medium truncate">Coworking-Platz</span><span
+												class="text-[.6rem] rounded px-1.5 py-0.5 font-medium shrink-0"
+												style="background:color-mix(in srgb,var(--brand) 13%,transparent);color:var(--brand)">betrieblich</span>
+										</div>
+										<div class="text-[.72rem] mt-0.5" style="color:var(--muted)">Fixkosten · <span
+												class="js-date" data-day="1" data-fmt="short">01.06.</span></div>
+									</div>
+									<div class="text-right shrink-0">
+										<div class="num font-medium">178,50 €</div>
+										<div class="text-[.66rem] mt-0.5" style="color:var(--muted)">VSt 28,50 · netto
+											150,00</div>
+									</div>
+								</div>
+								<div class="ui-r flex items-center gap-3 py-2.5"
+									style="border-top:1px solid var(--hair)">
+									<div class="min-w-0 flex-1">
+										<div class="flex items-center gap-2"><span class="font-medium truncate">Figma
+												Professional</span><span
+												class="text-[.6rem] rounded px-1.5 py-0.5 font-medium shrink-0"
+												style="background:color-mix(in srgb,var(--brand) 13%,transparent);color:var(--brand)">betrieblich</span>
+										</div>
+										<div class="text-[.72rem] mt-0.5" style="color:var(--muted)">Subscription ·
+											<span class="js-date" data-day="3" data-fmt="short">03.06.</span></div>
+									</div>
+									<div class="text-right shrink-0">
+										<div class="num font-medium">18,00 €</div>
+										<div class="text-[.66rem] mt-0.5" style="color:var(--brand)">§13b Reverse-Charge
+										</div>
+									</div>
+								</div>
+								<div class="ui-r flex items-center gap-3 py-2.5"
+									style="border-top:1px solid var(--hair)">
+									<div class="min-w-0 flex-1">
+										<div class="flex items-center gap-2"><span class="font-medium truncate">Miete
+												Wohnung</span><span
+												class="text-[.6rem] rounded px-1.5 py-0.5 font-medium shrink-0"
+												style="background:var(--bg-2);color:var(--muted);border:1px solid var(--hair)">privat</span>
+										</div>
+										<div class="text-[.72rem] mt-0.5" style="color:var(--muted)">Fixkosten · <span
+												class="js-date" data-day="1" data-fmt="short">01.06.</span></div>
+									</div>
+									<div class="text-right shrink-0">
+										<div class="num font-medium">1.150,00 €</div>
+										<div class="text-[.66rem] mt-0.5" style="color:var(--muted)">netto 1.150,00
+										</div>
+									</div>
+								</div>
+								<div class="ui-r flex items-center gap-3 py-2.5"
+									style="border-top:1px solid var(--hair)">
+									<div class="min-w-0 flex-1">
+										<div class="flex items-center gap-2"><span
+												class="font-medium truncate">Mobilfunk</span><span
+												class="text-[.6rem] rounded px-1.5 py-0.5 font-medium shrink-0"
+												style="background:var(--bg-2);color:var(--muted);border:1px solid var(--hair)">privat</span>
+										</div>
+										<div class="text-[.72rem] mt-0.5" style="color:var(--muted)">Fixkosten · <span
+												class="js-date" data-day="15" data-fmt="short">15.06.</span></div>
+									</div>
+									<div class="text-right shrink-0">
+										<div class="num font-medium">39,00 €</div>
+										<div class="text-[.66rem] mt-0.5" style="color:var(--muted)">netto 39,00</div>
+									</div>
+								</div>
+							</div>
+							<div class="mt-3 pt-3 flex items-center justify-between text-[.8rem]"
+								style="border-top:1px solid var(--hair)">
+								<span style="color:var(--muted)">67 Einträge</span>
+								<span>Summe · <span class="num font-semibold">14.614,68 €</span></span>
+							</div>
+						</div>
+					</div>
+					<div class="reveal d1 order-1 lg:order-2">
+						<span class="eyebrow normal-case tracking-[.05em]">Ausgaben</span>
+						<h3 class="font-display text-[1.7rem] font-bold mt-4 leading-tight">Ein Ledger für <em>alle</em>
+							Abflüsse.</h3>
+						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> Betriebsausgaben, Fixkosten,
+							Subscriptions sowie Vorsorge (KSK) und Steuern in einer Tabelle, gefiltert nach Art · Sparte
+							· Monat. Pro Posten brutto/VSt/netto, Steuerart, umlagefähig. Wiederkehrendes als datierte
+							Buchungen – Vorlagen per Klick oder „Vormonat duplizieren“. Privat und betrieblich sauber
+							getrennt. </p>
+					</div>
+				</div>
+				<!-- two-up gallery: Jahresabschluss + Privat -->
+				<div class="mt-20 grid md:grid-cols-2 gap-8">
+					<div class="reveal">
+						<!-- native rebuild · Jahresabschluss / EÜR -->
+						<div class="pan-x">
+							<div class="ui-card ui-hover overflow-hidden">
+								<div class="p-5 grid grid-cols-2 gap-4 text-white"
+									style="background:linear-gradient(125deg,#1aa45f,#15803d)">
+									<div>
+										<div class="text-[.72rem]" style="opacity:.88">Gewinn (EÜR)</div>
+										<div class="num text-[1.45rem] font-semibold mt-1 leading-none">13.976,00 €
+										</div>
+									</div>
+									<div>
+										<div class="text-[.72rem]" style="opacity:.88">Steuerlast · gesch.</div>
+										<div class="num text-[1.45rem] font-semibold mt-1 leading-none">5.580,00 €</div>
+									</div>
+								</div>
+								<div class="p-5 pb-10">
+									<div class="eyebrow normal-case tracking-[.1em]">Einnahmenüberschuss · EÜR</div>
+									<div class="mt-2.5">
+										<div class="ui-r flex items-center justify-between py-2"><span
+												style="color:var(--ink-2)">Betriebseinnahmen · Zufluss</span><span
+												class="num">16.700,00 €</span></div>
+										<div class="ui-r flex items-center justify-between py-2"
+											style="border-top:1px solid var(--hair)"><span
+												style="color:var(--muted)">Laufende Ausgaben</span><span class="num">−
+												1.524,00 €</span></div>
+										<div class="ui-r flex items-center justify-between py-2"
+											style="border-top:1px solid var(--hair)"><span
+												style="color:var(--muted)">Anschaffungen · Sofortabzug</span><span
+												class="num">− 1.200,00 €</span></div>
+										<div class="ui-r flex items-center justify-between py-2.5 mt-1 rounded-lg px-2"
+											style="background:color-mix(in srgb,var(--pos) 12%,transparent)"><span
+												class="font-semibold">= Gewinn (EÜR)</span><span class="num font-medium"
+												style="color:var(--pos)">13.976,00 €</span></div>
+									</div>
+									<div class="eyebrow normal-case tracking-[.1em] mt-5">Einkommensteuer · Rücklage
+									</div>
+									<div class="mt-2.5">
+										<div class="ui-r flex items-center justify-between py-2"><span
+												style="color:var(--ink-2)">Gewinn (EÜR)</span><span
+												class="num">13.976,00 €</span></div>
+										<div class="ui-r flex items-center justify-between py-2"
+											style="border-top:1px solid var(--hair)"><span style="color:var(--muted)">−
+												Vorsorge (KSK)</span><span class="num">− 2.520,00 €</span></div>
+										<div class="ui-r flex items-center justify-between py-2"
+											style="border-top:1px solid var(--hair)"><span
+												style="color:var(--muted)">Steuerpfl. Gewinn · grob</span><span
+												class="num">11.456,00 €</span></div>
+										<div class="ui-r flex items-center justify-between py-2.5 mt-1 rounded-lg px-2"
+											style="background:color-mix(in srgb,var(--brand-2) 12%,transparent)"><span
+												class="font-semibold">ESt-Rücklage · pauschal</span><span
+												class="num font-medium" style="color:var(--brand-2)">2.228,40 €</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<h3 class="font-display text-[1.3rem] font-bold mt-5">Jahresabschluss</h3>
+						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">EÜR nach Zufluss,
+							ESt-Abgleich (Schätzung vs. tatsächlich geleistet), Beleg-Export pro Jahr.</p>
+					</div>
+					<div class="reveal d1">
+						<!-- native rebuild · Privat-Übersicht -->
+						<div class="pan-x">
+							<div class="ui-card ui-hover p-5">
+								<div class="flex items-center justify-between">
+									<div>
+										<div class="font-display text-[1.05rem] font-bold leading-none">Privatausgaben
+										</div>
+										<div class="text-[.8rem] mt-1.5" style="color:var(--muted)"><span
+												class="js-year">2026</span> · pro Monat</div>
+									</div>
+									<div class="flex items-center gap-1 p-1 rounded-[10px]"
+										style="background:var(--bg-2)"><span class="ui-tab on">Gesamt</span><span
+											class="ui-tab">Essen</span></div>
+								</div>
+								<div id="pv-chart" class="mt-5 flex items-end gap-1 h-24">
+									<div class="flex-1 flex flex-col justify-end h-full"><span
+											class="bar-grow rounded-t"
+											style="height:89%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+									</div>
+									<div class="flex-1 flex flex-col justify-end h-full"><span
+											class="bar-grow rounded-t"
+											style="height:100%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+									</div>
+									<div class="flex-1 flex flex-col justify-end h-full"><span
+											class="bar-grow rounded-t"
+											style="height:98%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+									</div>
+									<div class="flex-1 flex flex-col justify-end h-full"><span
+											class="bar-grow rounded-t"
+											style="height:94%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+									</div>
+									<div class="flex-1 flex flex-col justify-end h-full"><span
+											class="bar-grow rounded-t"
+											style="height:99%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+									</div>
+									<div class="flex-1 flex flex-col justify-end h-full"><span
+											class="bar-grow rounded-t"
+											style="height:94%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+									</div>
+									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+											style="height:8%;background:var(--bg-2)"></span></div>
+									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+											style="height:8%;background:var(--bg-2)"></span></div>
+									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+											style="height:8%;background:var(--bg-2)"></span></div>
+									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+											style="height:8%;background:var(--bg-2)"></span></div>
+									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+											style="height:8%;background:var(--bg-2)"></span></div>
+									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
+											style="height:8%;background:var(--bg-2)"></span></div>
+								</div>
+								<div class="flex gap-1 mt-1.5 text-[.55rem] text-center" style="color:var(--muted)">
+									<span class="flex-1">J</span><span class="flex-1">F</span><span
+										class="flex-1">M</span><span class="flex-1">A</span><span
+										class="flex-1">M</span><span class="flex-1">J</span><span
+										class="flex-1">J</span><span class="flex-1">A</span><span
+										class="flex-1">S</span><span class="flex-1">O</span><span
+										class="flex-1">N</span><span class="flex-1">D</span>
+								</div>
+								<div class="mt-4 grid grid-cols-2 gap-2">
+									<div class="rounded-lg p-2.5"
+										style="background:var(--surface-2);border:1px solid var(--hair)">
+										<div class="text-[.66rem]" style="color:var(--muted)">Fixkosten · <span
+												class="js-month">Juni</span></div>
+										<div class="num font-semibold mt-0.5">1.267,00 €</div>
+									</div>
+									<div class="rounded-lg p-2.5"
+										style="background:var(--surface-2);border:1px solid var(--hair)">
+										<div class="text-[.66rem]" style="color:var(--muted)">Subscriptions</div>
+										<div class="num font-semibold mt-0.5">24,98 €</div>
+									</div>
+									<div class="rounded-lg p-2.5"
+										style="background:var(--surface-2);border:1px solid var(--hair)">
+										<div class="text-[.66rem]" style="color:var(--muted)">Lebensmittel</div>
+										<div class="num font-semibold mt-0.5">106,50 €</div>
+									</div>
+									<div class="rounded-lg p-2.5"
+										style="background:var(--surface-2);border:1px solid var(--hair)">
+										<div class="text-[.66rem]" style="color:var(--muted)">Einkäufe</div>
+										<div class="num font-semibold mt-0.5">0,00 €</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<h3 class="font-display text-[1.3rem] font-bold mt-5">Privat, getrennt gehalten</h3>
+						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Privat-Übersicht,
+							Lebensmittel &amp; Anschaffungen mit optionalen Budgets – sauber vom Betrieblichen getrennt.
+						</p>
+					</div>
+				</div>
+				<!-- compact capability grid -->
+				<div class="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+					<div class="reveal rounded-xl p-5" style="background:var(--surface);border:1px solid var(--hair)">
+						<h4 class="font-semibold">Sanfter Einstieg</h4>
+						<p class="mt-1.5 text-[.9rem] leading-relaxed" style="color:var(--muted)">Leer beginnen oder mit
+							Demodaten ausprobieren – risikofrei, jederzeit löschbar.</p>
+					</div>
+					<div class="reveal d1 rounded-xl p-5"
+						style="background:var(--surface);border:1px solid var(--hair)">
+						<h4 class="font-semibold">Beleg-Export (ZIP)</h4>
+						<p class="mt-1.5 text-[.9rem] leading-relaxed" style="color:var(--muted)">Pro Jahr – für
+							Steuerberater oder Betriebsprüfung.</p>
+					</div>
+					<div class="reveal d2 rounded-xl p-5"
+						style="background:var(--surface);border:1px solid var(--hair)">
+						<h4 class="font-semibold">Aufgaben</h4>
+						<p class="mt-1.5 text-[.9rem] leading-relaxed" style="color:var(--muted)">Einmalig, monatlich,
+							quartalsweise, jährlich. Abgehakt → nächste Fälligkeit erscheint von selbst.</p>
+					</div>
+					<div class="reveal d3 rounded-xl p-5"
+						style="background:var(--surface);border:1px solid var(--hair)">
+						<h4 class="font-semibold">Auto-Backup</h4>
+						<p class="mt-1.5 text-[.9rem] leading-relaxed" style="color:var(--muted)">Täglich,
+							Komplett-Backup mit Belegen, JSON-Export/-Import (dedupliziert).</p>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- ============ §6 DIE FEINHEITEN ============ -->
+		<section class="py-24 sm:py-32">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="max-w-3xl reveal">
+					<span class="eyebrow">Die Feinheiten</span>
+					<h2
+						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Hier hat jemand mit Liebe gebaut. </h2>
+				</div>
+				<div class="mt-12 grid md:grid-cols-2 gap-x-12 gap-y-px">
+					<!-- column items as list rows -->
+					<div class="reveal flex gap-4 py-5 hairline border-b">
+						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
+						<p class="leading-relaxed"><strong>Inspector statt Sheet.</strong> <span
+								style="color:var(--muted)">Bearbeiten in einem ruhigen Flyout neben der Tabelle, live
+								gebunden – kein Modal, das dich aus dem Kontext reißt.</span></p>
+					</div>
+					<div class="reveal flex gap-4 py-5 hairline border-b">
+						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
+						<p class="leading-relaxed"><strong>Ein Klick, fertig.</strong> <span
+								style="color:var(--muted)">„Duplizieren (heute)“, „bezahlt → heutiges Datum“, Inline-„+“
+								direkt in der Tabelle.</span></p>
+					</div>
+					<div class="reveal flex gap-4 py-5 hairline border-b">
+						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
+						<p class="leading-relaxed"><strong>Jede Zahl ist kopierbar.</strong> <span
+								style="color:var(--muted)">Klick auf einen Wert legt ihn in die Zwischenablage – fürs
+								ELSTER-Formular oder die Mail an den Berater.</span></p>
+					</div>
+					<div class="reveal flex gap-4 py-5 hairline border-b">
+						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
+						<p class="leading-relaxed"><strong>Soll und Ist sauber getrennt.</strong> <span
+								style="color:var(--muted)">KSK-Monatswert = Soll, die echte Abbuchung = Ist im
+								Zahlungs-Ledger. Keine stille Vermischung.</span></p>
+					</div>
+					<div class="reveal flex gap-4 py-5 hairline border-b">
+						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
+						<p class="leading-relaxed"><strong>Datierte Sätze.</strong> <span
+								style="color:var(--muted)">ESt-Satz ab Februar 15&nbsp;%? Ältere Monate bleiben, wie sie
+								waren; KSK-Werte erben einzeln vom Vormonat.</span></p>
+					</div>
+					<div class="reveal flex gap-4 py-5 hairline border-b">
+						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
+						<p class="leading-relaxed"><strong>USt-Vorauszahlung im Januar?</strong> <span
+								style="color:var(--muted)">Kontor weiß, dass die zum Vorjahr gehört (Fälligkeitsfenster,
+								mit/ohne Dauerfristverlängerung) – und ordnet sie richtig zu.</span></p>
+					</div>
+					<div class="reveal flex gap-4 py-5 hairline border-b">
+						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
+						<p class="leading-relaxed"><strong>Geteilter Zeitraum.</strong> <span
+								style="color:var(--muted)">Modulwechsel behält den gewählten Monat/das Jahr. Das
+								Dashboard zeigt trotzdem immer „heute“.</span></p>
+					</div>
+					<div class="reveal flex gap-4 py-5 hairline border-b">
+						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
+						<p class="leading-relaxed"><strong>Geld ist <span class="num">Decimal</span>, nie <span
+									class="num">Double</span>.</strong> <span style="color:var(--muted)">Cent-genau,
+								keine Rundungsgespenster. Klingt nach Detail, ist Vertrauen.</span></p>
+					</div>
+					<div class="reveal flex gap-4 py-5 hairline border-b">
+						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
+						<p class="leading-relaxed"><strong>Zurückhaltendes Design.</strong> <span
+								style="color:var(--muted)">Neutrale graue Icons, Farbe nur dort, wo sie etwas bedeutet –
+								in Summen und roten Negativwerten.</span></p>
+					</div>
+					<div class="reveal flex gap-4 py-5 hairline border-b">
+						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
+						<p class="leading-relaxed"><strong>Geprüft, nicht gehofft.</strong> <span
+								style="color:var(--muted)">Die Engine läuft gegen nachrechenbare Demo-Werte –
+								Soll/Zufluss, §13b-Rundung, §17, Rücklagen. Stimmt, statt „sollte stimmen“.</span></p>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- ============ §7 FÜR WEN ============ -->
+		<section class="py-24 sm:py-32" style="background:var(--bg-2)">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="max-w-3xl reveal">
+					<span class="eyebrow">Für wen</span>
+					<h2
+						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Erkennst du dich wieder? </h2>
+				</div>
+				<div class="mt-12 grid lg:grid-cols-2 gap-5">
+					<div class="reveal rounded-2xl p-8" style="background:var(--surface);border:1px solid var(--hair)">
+						<h3 class="font-display text-[1.4rem] font-bold">Kontor ist für dich, wenn du …</h3>
+						<ul class="mt-5 space-y-3.5">
+							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+									stroke-linecap="round" stroke-linejoin="round">
+									<path d="M20 6L9 17l-5-5" />
+								</svg><span style="color:var(--ink-2)">als <strong
+										style="color:var(--ink)">Freiberufler:in</strong> arbeitest (Design,
+									Entwicklung, Text, Foto …),</span></li>
+							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+									stroke-linecap="round" stroke-linejoin="round">
+									<path d="M20 6L9 17l-5-5" />
+								</svg><span style="color:var(--ink-2)">deine <strong
+										style="color:var(--ink)">EÜR</strong> selbst machst und quartalsweise <strong
+										style="color:var(--ink)">UStVA</strong> abgibst,</span></li>
+							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+									stroke-linecap="round" stroke-linejoin="round">
+									<path d="M20 6L9 17l-5-5" />
+								</svg><span style="color:var(--ink-2)"><strong
+										style="color:var(--ink)">KSK-versichert</strong> bist oder es bald wirst,</span>
+							</li>
+							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+									stroke-linecap="round" stroke-linejoin="round">
+									<path d="M20 6L9 17l-5-5" />
+								</svg><span style="color:var(--ink-2)">deine Zahlen lieber <strong
+										style="color:var(--ink)">auf dem eigenen Gerät</strong> hast als in der
+									Cloud,</span></li>
+							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+									stroke-linecap="round" stroke-linejoin="round">
+									<path d="M20 6L9 17l-5-5" />
+								</svg><span style="color:var(--ink-2)">eine App willst, die <em>deinen</em> Fall kann –
+									nicht 90&nbsp;% von jedermanns Fall.</span></li>
+						</ul>
+					</div>
+					<div class="reveal d1 rounded-2xl p-8"
+						style="background:color-mix(in srgb,var(--surface) 50%,transparent);border:1px dashed var(--hair)">
+						<h3 class="font-display text-[1.4rem] font-bold" style="color:var(--muted)">(Noch) nicht für
+							dich, wenn du …</h3>
+						<ul class="mt-5 space-y-3.5">
+							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--muted)"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+									stroke-linecap="round" stroke-linejoin="round">
+									<path d="M18 6L6 18M6 6l12 12" />
+								</svg><span style="color:var(--muted)"><strong>Ist-Versteuerung</strong> oder
+									Kleinunternehmer (§19) brauchst,</span></li>
+							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--muted)"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+									stroke-linecap="round" stroke-linejoin="round">
+									<path d="M18 6L6 18M6 6l12 12" />
+								</svg><span style="color:var(--muted)">ausgangsseitig <strong>7&nbsp;% USt</strong>
+									verrechnest,</span></li>
+							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--muted)"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+									stroke-linecap="round" stroke-linejoin="round">
+									<path d="M18 6L6 18M6 6l12 12" />
+								</svg><span style="color:var(--muted)">eine <strong>GmbH</strong> mit doppelter
+									Buchführung, Lohnabrechnung und Multi-User-Teams führst.</span></li>
+						</ul>
+						<p class="mt-6 text-[.9rem]" style="color:var(--muted)">Wer sich hier wiedererkennt, ist nicht
+							die Zielgruppe – auch gut.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- ============ SCREENSHOT-GALERIE (echte App-Aufnahmen) ============ -->
+		<section id="galerie" class="py-24 sm:py-32">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="max-w-3xl reveal">
+					<span class="eyebrow">Sieh selbst</span>
+					<h2
+						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Echte Aufnahmen aus Kontor. </h2>
+					<p class="mt-6 text-[1.12rem] leading-relaxed" style="color:var(--ink-2)"> Kein Mockup-Zauber – das
+						ist die App. Wisch dich seitlich durch<span class="hidden md:inline"> und klick zum
+							Vergrößern</span>. </p>
+				</div>
+			</div>
+			<div class="gal-scroll mt-12 flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory px-5 sm:px-8 py-2">
+				<figure class="gal-item snap-start shrink-0 w-[155vw] md:w-[80vw] md:max-w-[660px]"
+					data-light="assets/img/dashboard-light.png" data-dark="assets/img/dashboard-dark.png"
+					data-caption="Übersicht">
+					<button type="button" class="gal-zoom" aria-label="Übersicht vergrößern">
+						<img src="assets/img/dashboard-light.png" alt="Kontor Übersicht" class="imlight gal-img"
+							loading="lazy" />
+						<img src="assets/img/dashboard-dark.png" alt="Kontor Übersicht (dunkel)" class="imdark gal-img"
+							loading="lazy" />
+					</button>
+					<figcaption class="mt-3.5 text-[.92rem] text-center" style="color:var(--muted)">Übersicht ·
+						Dashboard</figcaption>
+				</figure>
+				<figure class="gal-item snap-start shrink-0 w-[155vw] md:w-[80vw] md:max-w-[660px]"
+					data-light="assets/img/monatsabschluss-light.png" data-dark="assets/img/monatsabschluss-dark.png"
+					data-caption="Monatsabschluss">
+					<button type="button" class="gal-zoom" aria-label="Monatsabschluss vergrößern">
+						<img src="assets/img/monatsabschluss-light.png" alt="Kontor Monatsabschluss"
+							class="imlight gal-img" loading="lazy" />
+						<img src="assets/img/monatsabschluss-dark.png" alt="Kontor Monatsabschluss (dunkel)"
+							class="imdark gal-img" loading="lazy" />
+					</button>
+					<figcaption class="mt-3.5 text-[.92rem] text-center" style="color:var(--muted)">Monatsabschluss ·
+						Frei verfügbar</figcaption>
+				</figure>
+				<figure class="gal-item snap-start shrink-0 w-[155vw] md:w-[80vw] md:max-w-[660px]"
+					data-light="assets/img/ustva-light.png" data-dark="assets/img/ustva-dark.png" data-caption="UStVA">
+					<button type="button" class="gal-zoom" aria-label="UStVA vergrößern">
+						<img src="assets/img/ustva-light.png" alt="Kontor UStVA" class="imlight gal-img"
+							loading="lazy" />
+						<img src="assets/img/ustva-dark.png" alt="Kontor UStVA (dunkel)" class="imdark gal-img"
+							loading="lazy" />
+					</button>
+					<figcaption class="mt-3.5 text-[.92rem] text-center" style="color:var(--muted)">UStVA ·
+						ELSTER-Kennzahlen</figcaption>
+				</figure>
+				<figure class="gal-item snap-start shrink-0 w-[155vw] md:w-[80vw] md:max-w-[660px]"
+					data-light="assets/img/kontoauszug-light.png" data-dark="assets/img/kontoauszug-dark.png"
+					data-caption="Kontoauszug">
+					<button type="button" class="gal-zoom" aria-label="Kontoauszug vergrößern">
+						<img src="assets/img/kontoauszug-light.png" alt="Kontor Kontoauszug-Import"
+							class="imlight gal-img" loading="lazy" />
+						<img src="assets/img/kontoauszug-dark.png" alt="Kontor Kontoauszug-Import (dunkel)"
+							class="imdark gal-img" loading="lazy" />
+					</button>
+					<figcaption class="mt-3.5 text-[.92rem] text-center" style="color:var(--muted)">Kontoauszug ·
+						CSV-Triage</figcaption>
+				</figure>
+				<figure class="gal-item snap-start shrink-0 w-[155vw] md:w-[80vw] md:max-w-[660px]"
+					data-light="assets/img/ausgaben-light.png" data-dark="assets/img/ausgaben-dark.png"
+					data-caption="Ausgaben">
+					<button type="button" class="gal-zoom" aria-label="Ausgaben vergrößern">
+						<img src="assets/img/ausgaben-light.png" alt="Kontor Ausgaben-Ledger" class="imlight gal-img"
+							loading="lazy" />
+						<img src="assets/img/ausgaben-dark.png" alt="Kontor Ausgaben-Ledger (dunkel)"
+							class="imdark gal-img" loading="lazy" />
+					</button>
+					<figcaption class="mt-3.5 text-[.92rem] text-center" style="color:var(--muted)">Ausgaben · ein
+						Ledger für alles</figcaption>
+				</figure>
+				<figure class="gal-item snap-start shrink-0 w-[155vw] md:w-[80vw] md:max-w-[660px]"
+					data-light="assets/img/jahresabschluss-light.png" data-dark="assets/img/jahresabschluss-dark.png"
+					data-caption="Jahresabschluss">
+					<button type="button" class="gal-zoom" aria-label="Jahresabschluss vergrößern">
+						<img src="assets/img/jahresabschluss-light.png" alt="Kontor Jahresabschluss"
+							class="imlight gal-img" loading="lazy" />
+						<img src="assets/img/jahresabschluss-dark.png" alt="Kontor Jahresabschluss (dunkel)"
+							class="imdark gal-img" loading="lazy" />
+					</button>
+					<figcaption class="mt-3.5 text-[.92rem] text-center" style="color:var(--muted)">Jahresabschluss ·
+						EÜR</figcaption>
+				</figure>
+				<figure class="gal-item snap-start shrink-0 w-[155vw] md:w-[80vw] md:max-w-[660px]"
+					data-light="assets/img/privat-light.png" data-dark="assets/img/privat-dark.png"
+					data-caption="Privat-Übersicht">
+					<button type="button" class="gal-zoom" aria-label="Privat-Übersicht vergrößern">
+						<img src="assets/img/privat-light.png" alt="Kontor Privat-Übersicht" class="imlight gal-img"
+							loading="lazy" />
+						<img src="assets/img/privat-dark.png" alt="Kontor Privat-Übersicht (dunkel)"
+							class="imdark gal-img" loading="lazy" />
+					</button>
+					<figcaption class="mt-3.5 text-[.92rem] text-center" style="color:var(--muted)">Privat · sauber
+						getrennt</figcaption>
+				</figure>
+				<figure class="gal-item snap-start shrink-0 w-[155vw] md:w-[80vw] md:max-w-[660px]"
+					data-light="assets/img/einnahmen-light.png" data-dark="assets/img/einnahmen-dark.png"
+					data-caption="Einnahmen">
+					<button type="button" class="gal-zoom" aria-label="Einnahmen vergrößern">
+						<img src="assets/img/einnahmen-light.png" alt="Kontor Einnahmen" class="imlight gal-img"
+							loading="lazy" />
+						<img src="assets/img/einnahmen-dark.png" alt="Kontor Einnahmen (dunkel)" class="imdark gal-img"
+							loading="lazy" />
+					</button>
+					<figcaption class="mt-3.5 text-[.92rem] text-center" style="color:var(--muted)">Einnahmen ·
+						Ausgangsrechnungen</figcaption>
+				</figure>
+			</div>
+		</section>
+		<!-- ============ §8 TECHNIK & VERTRAUEN ============ -->
+		<section class="py-24 sm:py-32">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="max-w-3xl reveal">
+					<span class="eyebrow">Technik &amp; Vertrauen</span>
+					<h2
+						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Prüf den Code, nicht nur das Versprechen. </h2>
+				</div>
+				<div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+					<div class="reveal rounded-2xl p-7"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<h3 class="font-display text-[1.2rem] font-bold">100&nbsp;% lokal</h3>
+						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">SwiftUI + SwiftData,
+							native macOS-App. Kein Netzwerk, keine Telemetrie, App-Sandbox aktiv.</p>
+					</div>
+					<div class="reveal d1 rounded-2xl p-7"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<h3 class="font-display text-[1.2rem] font-bold">Deine Daten gehören dir</h3>
+						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Alles liegt im
+							App-Container deines Macs. Backups sind klartextlesbare JSON-Dateien in deinem Ordner.</p>
+					</div>
+					<div class="reveal d2 rounded-2xl p-7"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<h3 class="font-display text-[1.2rem] font-bold">Korrektheit ist getestet</h3>
+						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Die Steuerlogik steckt
+							in reinen, geprüften Bausteinen – verifiziert gegen nachrechenbare Demo-Werte.</p>
+					</div>
+					<div class="reveal rounded-2xl p-7"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<h3 class="font-display text-[1.2rem] font-bold">KI-Zugriff – auch lokal</h3>
+						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Der MCP-Server lauscht
+							nur auf <span class="num">127.0.0.1</span>, ist Token-geschützt (Keychain) und sichert vor
+							dem ersten Schreibzugriff.</p>
+					</div>
+					<div class="reveal d1 rounded-2xl p-7"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<h3 class="font-display text-[1.2rem] font-bold">Quelltext offen</h3>
+						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Source-available auf
+							GitHub (PolyForm Perimeter) – prüf den Code, vertrau nicht nur dem Versprechen.</p>
+					</div>
+					<div class="reveal d2 rounded-2xl p-7"
+						style="background:var(--surface-2);border:1px solid var(--hair)">
+						<h3 class="font-display text-[1.2rem] font-bold">Kein Abo</h3>
+						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Einmalkauf statt
+							Abo-Falle. Bezahlst du einmal, gehört dir die App.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- ============ §9 PREIS ============ -->
+		<section id="preis" class="py-24 sm:py-32" style="background:var(--bg-2)">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="max-w-3xl reveal">
+					<span class="eyebrow">Preis</span>
+					<h2
+						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Kaufen oder selbst bauen. Kein Abo, keine Tricks. </h2>
+				</div>
+				<div class="mt-12 grid lg:grid-cols-2 gap-5 items-stretch">
+					<!-- Einmalkauf (highlight) -->
+					<div class="reveal relative rounded-3xl p-8 sm:p-10 overflow-hidden"
+						style="background:var(--surface);border:1px solid color-mix(in srgb,var(--brand) 40%,var(--hair));box-shadow:var(--shadow)">
+						<div class="absolute inset-x-0 top-0 h-1"
+							style="background:linear-gradient(90deg,var(--brand-blue),var(--brand-2))"></div>
+						<div class="flex items-center justify-between">
+							<span class="eyebrow normal-case tracking-[.05em]">Einmalkauf</span>
+							<span class="pill rounded-full px-3 py-1 text-[.74rem]"
+								style="color:var(--brand)">Empfohlen</span>
+						</div>
+						<div class="mt-6 flex items-end gap-2">
+							<span class="num font-display text-[3.5rem] leading-none font-medium">19,99&nbsp;€</span>
+						</div>
+						<p class="mt-2" style="color:var(--muted)">einmalig – kein Abo</p>
+						<p class="mt-5 leading-relaxed" style="color:var(--ink-2)">Die fertige, signierte &amp;
+							notarisierte App für deinen Mac. Alle Funktionen, keine Cloud, keine Folgekosten.</p>
+						<ul class="mt-6 space-y-2.5 text-[.97rem]">
+							<li class="flex gap-2.5"><svg class="w-4 h-4 mt-1 shrink-0" style="color:var(--pos)"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+									stroke-linecap="round" stroke-linejoin="round">
+									<path d="M20 6L9 17l-5-5" />
+								</svg><span style="color:var(--ink-2)">Voller Funktionsumfang</span></li>
+							<li class="flex gap-2.5"><svg class="w-4 h-4 mt-1 shrink-0" style="color:var(--pos)"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+									stroke-linecap="round" stroke-linejoin="round">
+									<path d="M20 6L9 17l-5-5" />
+								</svg><span style="color:var(--ink-2)">Lokal &amp; offline, App-Sandbox</span></li>
+							<li class="flex gap-2.5"><svg class="w-4 h-4 mt-1 shrink-0" style="color:var(--pos)"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+									stroke-linecap="round" stroke-linejoin="round">
+									<path d="M20 6L9 17l-5-5" />
+								</svg><span style="color:var(--ink-2)">Optionaler KI-Zugriff (MCP)</span></li>
+						</ul>
+						<a href="#"
+							class="btn-primary mt-8 inline-flex items-center justify-center gap-2 rounded-full px-6 h-[3.25rem] w-full text-[1rem] font-semibold">Für
+							macOS kaufen · <span class="num">19,99 €</span></a>
+					</div>
+					<!-- Fork -->
+					<div class="reveal d1 rounded-3xl p-8 sm:p-10"
+						style="background:color-mix(in srgb,var(--surface) 45%,transparent);border:1px dashed var(--hair)">
+						<span class="eyebrow normal-case tracking-[.05em]">Selbst bauen · spendenbasiert</span>
+						<div class="mt-6 font-display text-[3rem] leading-none font-bold">Dein Fork</div>
+						<p class="mt-2" style="color:var(--muted)">für Advanced User</p>
+						<p class="mt-5 leading-relaxed" style="color:var(--ink-2)">Der Quelltext ist offen. Bau dir mit
+							Xcode oder Claude Code deinen eigenen, privaten Fork und schneide Kontor exakt auf dich zu.
+						</p>
+						<ul class="mt-6 space-y-2.5 text-[.97rem]">
+							<li class="flex gap-2.5"><span class="num shrink-0" style="color:var(--brand)">↳</span><span
+									style="color:var(--ink-2)">Forken, anpassen, selbst bauen – frei</span></li>
+							<li class="flex gap-2.5"><span class="num shrink-0" style="color:var(--brand)">↳</span><span
+									style="color:var(--ink-2)">Nur für <strong style="color:var(--ink)">dich</strong>,
+									kein Weiterverkauf</span></li>
+							<li class="flex gap-2.5"><span class="num shrink-0" style="color:var(--brand)">↳</span><span
+									style="color:var(--ink-2)">Hilft dir Kontor? Ich freue mich über eine Spende
+									☕</span></li>
+						</ul>
+						<div class="mt-8 flex flex-wrap gap-3">
+							<a href="#"
+								class="btn-ghost inline-flex items-center gap-2 rounded-full px-5 h-[3rem] font-medium">
+								<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+									<path
+										d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 5 18 5.3 18 5.3c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z" />
+								</svg> Quellcode auf GitHub </a>
+							<a href="#"
+								class="btn-ghost inline-flex items-center gap-2 rounded-full px-5 h-[3rem] font-medium">Spenden</a>
+						</div>
+					</div>
+				</div>
+				<p class="reveal mt-6 text-[.9rem] max-w-3xl" style="color:var(--muted)"> Beide Wege sind ausdrücklich
+					erlaubt. Was nicht geht: Kontor (oder einen Fork) als Konkurrenzprodukt verkaufen – dafür gibt es
+					die Lizenz PolyForm Perimeter. </p>
+			</div>
+		</section>
+		<!-- ============ §10 FAQ ============ -->
+		<section id="faq" class="py-24 sm:py-32">
+			<div class="mx-auto max-w-3xl px-5 sm:px-8">
+				<div class="reveal text-center">
+					<span class="eyebrow justify-center">Häufige Fragen</span>
+					<h2
+						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Ehrliche Antworten. </h2>
+				</div>
+				<div class="reveal mt-12">
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Brauche ich ein Konto oder Internet?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Nein. Kontor läuft komplett offline.
+							Du brauchst kein Konto, keinen Login.</p>
+					</details>
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Wo liegen meine Daten?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ausschließlich auf deinem Mac, im
+							sandboxed App-Container. Backups schreibst du als Datei, wohin du willst.</p>
+					</details>
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Einmalkauf oder Abo?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Einmalkauf: 19,99&nbsp;€, fertig.
+							Kein Abo, keine Folgekosten. Wer mag und es kann, baut sich stattdessen einen eigenen Fork
+							und gibt freiwillig eine Spende.</p>
+					</details>
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Kann ich meine Bankumsätze importieren?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ja – den CSV-CAMT-Export deiner
+							Sparkasse. Du ordnest jede Buchung selbst zu, Kontor lernt mit und schlägt künftig vor.</p>
+					</details>
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Macht Kontor meine UStVA fertig?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Es liefert dir alle ELSTER-Kennzahlen
+							formular-getreu zum Übertragen. (ELSTER-Direktversand: Roadmap.)</p>
+					</details>
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Und die KI – sieht die meine Daten?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Nur wenn du den MCP-Server
+							einschaltest, und auch dann nur lokal. Nichts geht ins Internet.</p>
+					</details>
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Darf ich Kontor anpassen / forken?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ja, für dich selbst – ausdrücklich
+							erwünscht. Du darfst deinen Fork nur nicht verkaufen oder als konkurrierendes Produkt
+							weitergeben.</p>
+					</details>
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Funktioniert das mit meinem
+								Steuerberater?</span><span class="chev num shrink-0" style="color:var(--brand)">+</span>
+						</summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ja: Beleg-Export als ZIP pro Jahr und
+							JSON-Export für alles Übrige.</p>
+					</details>
+				</div>
+			</div>
+		</section>
+		<!-- ============ §11 SCHLUSS-CTA ============ -->
+		<section class="px-5 sm:px-8 pb-24 sm:pb-32">
+			<div class="reveal relative mx-auto max-w-7xl rounded-[2rem] overflow-hidden text-center px-6 py-20 sm:py-28"
+				style="background:linear-gradient(135deg,var(--brand-blue),var(--brand-2))">
+				<div class="absolute inset-0 opacity-30"
+					style="background:radial-gradient(60% 80% at 50% 0%,rgba(255,255,255,.45),transparent)"></div>
+				<div class="relative">
+					<h2
+						class="font-display font-extrabold text-white text-[clamp(2.2rem,5vw,4rem)] leading-[1.04] text-balance">
+						Deine Zahlen. Dein Mac. Deine Ruhe. </h2>
+					<p class="mt-5 mx-auto max-w-[46ch] text-white/85 text-[1.12rem] leading-relaxed"> Kontor macht die
+						Buchhaltung, die Freiberufler wirklich haben – korrekt, lokal, leicht. </p>
+					<div class="mt-9 flex flex-wrap items-center justify-center gap-3">
+						<a href="#"
+							class="inline-flex items-center gap-2 rounded-full px-6 h-[3.25rem] text-[1rem] font-semibold bg-white text-[#1d1d1f] hover:bg-white/90">
+							Für macOS kaufen · <span class="num">19,99 €</span>
+						</a>
+						<a href="#"
+							class="inline-flex items-center gap-2 rounded-full px-6 h-[3.25rem] text-[1rem] font-medium text-white border border-white/40 hover:bg-white/10">
+							Quellcode auf GitHub </a>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+	<!-- ============ FOOTER ============ -->
+	<footer class="pt-16 pb-12" style="border-top:1px solid var(--hair)">
+		<div class="mx-auto max-w-7xl px-5 sm:px-8">
+			<div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+				<div>
+					<a href="#top" class="flex items-center gap-2.5">
+						<img src="assets/AppIcon-512.png" alt="" class="w-7 h-7 rounded-[8px]" />
+						<span class="font-display text-[1.2rem] font-bold">Kontor</span>
+					</a>
+					<p class="mt-3 text-[.9rem] max-w-sm" style="color:var(--muted)"> Buchhaltung für Freiberufler –
+						korrekt, lokal, leicht. Eine native macOS-App von Wiredframe. </p>
+				</div>
+				<nav class="flex flex-wrap gap-x-7 gap-y-2.5 text-[.9rem]" style="color:var(--muted)">
+					<button type="button" data-modal="impressum" class="link-btn hover:opacity-70">Impressum</button>
+					<button type="button" data-modal="datenschutz" class="link-btn hover:opacity-70">Datenschutz</button>
+					<button type="button" data-modal="nutzung" class="link-btn hover:opacity-70">Nutzungsbedingungen</button>
+					<a href="#" class="hover:opacity-70">GitHub</a>
+				</nav>
+			</div>
+			<div class="mt-10 pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-[.82rem]"
+				style="border-top:1px solid var(--hair);color:var(--muted)">
+				<p>⚠️ Kontor ersetzt keine Steuerberatung. Berechnungen sind Schätzungen.</p>
+				<p>macOS&nbsp;15+ · © <span class="js-year">2026</span> Wiredframe</p>
+			</div>
+		</div>
+	</footer>
+	<!-- zoom lightbox for the screenshot gallery -->
+	<div id="lightbox" class="fixed inset-0 z-[100] items-center justify-center p-4 sm:p-10" aria-hidden="true"
+		role="dialog" aria-modal="true" aria-label="Screenshot-Vorschau">
+		<div class="lb-backdrop absolute inset-0"></div>
+		<img id="lb-img" class="relative rounded-2xl max-w-full max-h-[88vh] object-contain" alt="" />
+		<button id="lb-close" type="button"
+			class="absolute top-4 right-4 grid place-items-center w-11 h-11 rounded-full"
+			aria-label="Vorschau schließen">
+			<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+				stroke-linecap="round" stroke-linejoin="round">
+				<path d="M18 6 6 18M6 6l12 12" />
+			</svg>
+		</button>
+	</div>
+	<!-- legal modal: Impressum / Datenschutz / Nutzungsbedingungen -->
+	<div id="legal" class="fixed inset-0 z-[110] items-center justify-center p-4 sm:p-6" aria-hidden="true"
+		role="dialog" aria-modal="true" aria-labelledby="legal-title">
+		<div class="legal-backdrop absolute inset-0" data-legal-close></div>
+		<div class="legal-panel relative w-full max-w-[44rem] max-h-[86vh] flex flex-col overflow-hidden">
+			<header class="flex items-center justify-between gap-4 px-6 sm:px-8 py-5 shrink-0"
+				style="border-bottom:1px solid var(--hair)">
+				<h2 id="legal-title" class="font-display text-[1.3rem] font-bold">Impressum</h2>
+				<button type="button" data-legal-close
+					class="btn-ghost grid place-items-center w-10 h-10 rounded-full shrink-0" aria-label="Schließen">
+					<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+						stroke-linecap="round" stroke-linejoin="round">
+						<path d="M18 6 6 18M6 6l12 12" />
+					</svg>
+				</button>
+			</header>
+			<div class="legal-scroll legal-prose min-h-0 px-6 sm:px-8 py-7">
+
+				<!-- IMPRESSUM -->
+				<section data-legal="impressum">
+					<p class="lead">Angaben gemäß § 5 DDG (Digitale-Dienste-Gesetz).</p>
+					<h3>Allgemeine Angaben</h3>
+					<p>Ulf Schuster<br />Sindelsdorferstraße 27a<br />82377 Penzberg</p>
+					<p>E-Mail: <a href="mailto:info@wiredframe.de">info@wiredframe.de</a></p>
+					<h3>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h3>
+					<p>Ulf Schuster (Anschrift wie oben).</p>
+					<h3>Verbraucherstreitbeilegung</h3>
+					<p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer
+						Verbraucherschlichtungsstelle teilzunehmen.</p>
+					<h3>Haftung für Inhalte</h3>
+					<p>Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit,
+						Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als
+						Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den
+						allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir als Diensteanbieter jedoch nicht
+						verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen
+						zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder
+						Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine
+						diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung
+						möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend
+						entfernen.</p>
+					<h3>Haftung für Links</h3>
+					<p>Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss
+						haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der
+						verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die
+						verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft.
+						Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente inhaltliche
+						Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht
+						zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen.</p>
+					<h3>Urheberrecht</h3>
+					<p>Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem
+						deutschen Urheberrecht. Beiträge Dritter sind als solche gekennzeichnet. Die Vervielfältigung,
+						Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes
+						bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien
+						dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet. Die Betreiber der
+						Seiten sind bemüht, stets die Urheberrechte anderer zu beachten bzw. auf selbst erstellte sowie
+						lizenzfreie Werke zurückzugreifen.</p>
+				</section>
+
+				<!-- DATENSCHUTZ -->
+				<section data-legal="datenschutz" hidden>
+					<p class="lead">Diese Website ist bewusst datensparsam: keine Tracking-Cookies, keine Analyse-Werkzeuge,
+						keine Benutzerkonten.</p>
+					<h3>1. Verantwortlicher</h3>
+					<p>Ulf Schuster, Sindelsdorferstraße 27a, 82377 Penzberg · E-Mail:
+						<a href="mailto:info@wiredframe.de">info@wiredframe.de</a>
+					</p>
+					<h3>2. Hosting &amp; Server-Logfiles</h3>
+					<p>Diese Website wird bei GitHub Pages (GitHub, Inc., USA) gehostet. Beim Aufruf verarbeitet der
+						Hosting-Anbieter technisch notwendige Zugriffsdaten (u.&nbsp;a. IP-Adresse, Datum und Uhrzeit,
+						abgerufene Datei, übertragene Datenmenge, Referrer, Browser- und Betriebssystem-Kennung).
+						Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einem sicheren, stabilen
+						Betrieb). Eine Zusammenführung dieser Daten mit Ihrer Person erfolgt nicht.</p>
+					<h3>3. Schriftarten (Google Fonts)</h3>
+					<p>Zur einheitlichen Darstellung lädt diese Seite die Schrift „Plus&nbsp;Jakarta&nbsp;Sans" über Google
+						Fonts (Google Ireland Ltd. / Google LLC, USA). Dabei wird Ihre IP-Adresse an Google übertragen.
+						Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Details:
+						<a href="https://policies.google.com/privacy" target="_blank"
+							rel="noopener">policies.google.com/privacy</a>.
+					</p>
+					<h3>4. Tailwind CSS (CDN)</h3>
+					<p>Für das Layout wird die Bibliothek „Tailwind&nbsp;CSS" über ein Content Delivery Network
+						(cdn.tailwindcss.com) geladen. Auch dabei wird Ihre IP-Adresse an den jeweiligen Anbieter übertragen.
+						Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.</p>
+					<h3>5. Lokale Speicherung (localStorage)</h3>
+					<p>Ihre Auswahl des Erscheinungsbilds (Hell/Dunkel/System) wird ausschließlich lokal in Ihrem Browser
+						gespeichert. Diese Information verlässt Ihr Gerät nicht und wird nicht an uns übertragen. Es werden
+						keine Cookies zu Analyse- oder Werbezwecken gesetzt.</p>
+					<h3>6. Die App „Kontor"</h3>
+					<p>Die vorgestellte App verarbeitet Ihre Buchhaltungsdaten ausschließlich lokal auf Ihrem Mac. Es findet
+						keine Übertragung an uns oder Dritte statt. Diese Erklärung betrifft nur diese Website, nicht die App
+						selbst.</p>
+					<h3>7. Ihre Rechte</h3>
+					<p>Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17),
+						Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) sowie Widerspruch (Art. 21).
+						Ferner steht Ihnen ein Beschwerderecht bei einer Datenschutz-Aufsichtsbehörde zu. Zur Ausübung genügt
+						eine Nachricht an die oben genannte Adresse.</p>
+					<p class="lead" style="margin-top:1.6rem">Stand: Juni 2026</p>
+				</section>
+
+				<!-- NUTZUNGSBEDINGUNGEN -->
+				<section data-legal="nutzung" hidden>
+					<p class="lead">Diese Bedingungen regeln die Nutzung dieser Website sowie der App „Kontor". Mit Kauf bzw.
+						Nutzung erkennen Sie sie an.</p>
+					<h3>1. Leistungsgegenstand</h3>
+					<p>„Kontor" ist eine native macOS-Anwendung zur Unterstützung der eigenen Buchhaltung (u.&nbsp;a. EÜR,
+						Umsatzsteuer-Voranmeldung, KSK, Rücklagen) und läuft lokal auf dem Gerät des Nutzers. Ein Anspruch auf
+						einen bestimmten Funktionsumfang über die jeweils ausgelieferte Version hinaus besteht nicht.</p>
+					<h3>2. Keine Steuer- oder Rechtsberatung</h3>
+					<p>Kontor ist ein Werkzeug und ersetzt keine Steuer- oder Rechtsberatung. Alle Berechnungen, Kennzahlen
+						und Auswertungen sind Hilfswerte und können Fehler enthalten. Die Verantwortung für die Richtigkeit
+						der an Finanzbehörden übermittelten Angaben (z.&nbsp;B. via ELSTER) liegt allein beim Nutzer. Im
+						Zweifel ist fachkundiger Rat einzuholen.</p>
+					<h3>3. Bereitstellung „wie besehen"</h3>
+					<p>Die Software wird in der jeweils vorliegenden Form („wie besehen" und „wie verfügbar") bereitgestellt.
+						Eine Eignung für einen bestimmten Zweck, Fehlerfreiheit oder ununterbrochene Verfügbarkeit wird –
+						soweit gesetzlich zulässig – nicht zugesichert. Softwarefehler lassen sich nach dem Stand der Technik
+						nicht vollständig ausschließen.</p>
+					<h3>4. Änderungen und Einstellung</h3>
+					<p>Der Anbieter ist berechtigt, die App und diese Website jederzeit zu ändern, einzuschränken,
+						einzustellen oder die Weiterentwicklung und Bereitstellung von Updates ohne Vorankündigung zu beenden.
+						Ein Anspruch auf Pflege, Updates, Support oder dauerhafte Verfügbarkeit besteht nicht.</p>
+					<h3>5. Datensicherung</h3>
+					<p>Da Kontor lokal arbeitet, liegt die Sicherung der eigenen Daten allein in der Verantwortung des
+						Nutzers. Es werden regelmäßige Backups empfohlen; für Datenverluste wird keine Haftung übernommen.</p>
+					<h3>6. Haftungsbeschränkung</h3>
+					<p>Der Anbieter haftet unbeschränkt nur für Schäden aus der Verletzung des Lebens, des Körpers oder der
+						Gesundheit, bei Vorsatz und grober Fahrlässigkeit sowie nach dem Produkthaftungsgesetz. Bei einfach
+						fahrlässiger Verletzung einer wesentlichen Vertragspflicht (Kardinalpflicht) ist die Haftung auf den
+						vertragstypischen, vorhersehbaren Schaden begrenzt. Im Übrigen ist die Haftung – soweit gesetzlich
+						zulässig – ausgeschlossen. Insbesondere besteht keine Haftung für mittelbare Schäden, entgangenen
+						Gewinn, steuerliche Nachteile, Säumniszuschläge oder Folgen fehlerhafter Eingaben oder Auswertungen.</p>
+					<h3>7. Rechte der Käufer</h3>
+					<p>Die gesetzlichen Mängelrechte von Verbrauchern bleiben unberührt. Über die zwingenden gesetzlichen
+						Rechte hinaus bestehen keine Ansprüche der Käufer oder Nutzer gegenüber dem Anbieter.</p>
+					<h3>8. Lizenz und Quelltext</h3>
+					<p>Kontor ist „source-available" unter der Lizenz PolyForm Perimeter. Ein eigener, privater Fork zur
+						persönlichen Nutzung ist ausdrücklich gestattet; der Weiterverkauf oder das Anbieten als
+						konkurrierendes Produkt ist nicht zulässig. Es gelten die Bedingungen der jeweiligen Lizenz.</p>
+					<h3>9. Schlussbestimmungen</h3>
+					<p>Es gilt das Recht der Bundesrepublik Deutschland. Sollte eine Bestimmung unwirksam sein oder werden,
+						bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.</p>
+					<p class="lead" style="margin-top:1.6rem">Stand: Juni 2026</p>
+				</section>
+
+			</div>
+		</div>
+	</div>
+
+	<!-- ============ SCRIPTS ============ -->
+	<script>
+		// ---- fake "Aktualität": current year/month/quarter + 12-month series revealed up to this month ----
+		(function () {
+			var now = new Date();
+			var Y = now.getFullYear();
+			var M = now.getMonth();               // 0–11
+			var MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+			var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+			var MM = pad(M + 1);
+
+			// monthly € series — the charts reveal indices 0..M; later months stay "not yet closed"
+			var profit = [2480, 2620, 2710, 2540, 2746, 3146, 2980, 3180, 3010, 3290, 3160, 3440]; // hero · betrieblicher Gewinn
+			var revenue = [3600, 3800, 4100, 3500, 3900, 3400, 4200, 4600, 4100, 4800, 4300, 5200]; // hero · Umsatz (Kennzahl)
+			var expense = [1290, 1450, 1410, 1360, 1430, 1360, 1380, 1400, 1340, 1460, 1390, 1480]; // privat · Ausgaben
+
+			var eur = function (n, cents) {
+				return n.toLocaleString('de-DE', { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 }) + ' €';
+			};
+			var setAll = function (sel, val) {
+				document.querySelectorAll(sel).forEach(function (el) { el.textContent = val; });
+			};
+
+			// plain tokens
+			setAll('.js-year', Y);
+			setAll('.js-month', MONTHS[M]);
+			setAll('.js-quarter', 'Q' + (Math.floor(M / 3) + 1));
+			setAll('.js-deadline', '10. ' + MONTHS[(M + 1) % 12]); // UStVA: 10th of the following month
+
+			// dates: <span class="js-date" data-day="14" data-fmt="full|short">
+			document.querySelectorAll('.js-date').forEach(function (el) {
+				var d = pad(parseInt(el.getAttribute('data-day'), 10));
+				el.textContent = el.getAttribute('data-fmt') === 'full' ? d + '.' + MM + '.' + Y : d + '.' + MM + '.';
+			});
+
+			// hero · Umsatz (current month) + Gewinn-vs-Vormonat
+			setAll('.js-umsatz', eur(revenue[M], true));
+			var prev = profit[(M + 11) % 12];
+			setAll('.js-profit-now', eur(profit[M]));
+			setAll('.js-profit-prev', eur(prev));
+			setAll('.js-trend-word', profit[M] >= prev ? 'über dem' : 'unter dem');
+
+			// bar charts · 12 columns, fill 0..M, stub the rest
+			function renderBars(host, data, o) {
+				if (!host) return;
+				host.innerHTML = '';
+				for (var i = 0; i < 12; i++) {
+					var col = document.createElement('div');
+					col.className = 'flex-1 flex flex-col justify-end h-full';
+					var bar = document.createElement('span');
+					if (i <= M) {
+						bar.className = 'rounded-t ' + o.animate;
+						bar.style.height = Math.round(data[i] / o.scaleMax * 100) + '%';
+						bar.style.background = o.gradient;
+						if (o.animate === 'hw-bar') bar.style.animationDelay = (0.15 + i * 0.06).toFixed(2) + 's';
+					} else {
+						bar.className = 'rounded-t';
+						bar.style.height = o.stub + '%';
+						bar.style.background = 'var(--bg-2)';
+					}
+					col.appendChild(bar);
+					host.appendChild(col);
+				}
+			}
+			renderBars(document.getElementById('hw-chart'), profit,
+				{ scaleMax: 3700, gradient: 'linear-gradient(180deg,#3ddc84,#1aa45f)', animate: 'hw-bar', stub: 6 });
+			renderBars(document.getElementById('pv-chart'), expense,
+				{ scaleMax: 1500, gradient: 'linear-gradient(180deg,#fb7185,#f43f5e)', animate: 'bar-grow', stub: 8 });
+
+			// emphasise the current month in the hero label row
+			var labels = document.getElementById('hw-labels');
+			if (labels) {
+				Array.prototype.forEach.call(labels.children, function (c) { c.style.color = ''; c.style.fontWeight = ''; });
+				if (labels.children[M]) {
+					labels.children[M].style.color = 'var(--ink)';
+					labels.children[M].style.fontWeight = '600';
+				}
+			}
+		})();
+
+		// ---- theme: single button cycling Hell → Dunkel → System ----
+		var root = document.documentElement;
+		var themeMeta = document.querySelector('meta[name="theme-color"]');
+		var mq = window.matchMedia('(prefers-color-scheme: dark)');
+		var themeBtn = document.getElementById('theme-toggle');
+		var ORDER = ['light', 'dark', 'system'];
+		var LABEL = { light: 'Hell', dark: 'Dunkel', system: 'System' };
+		function currentMode() { try { return localStorage.getItem('kontor-theme') || 'system'; } catch (e) { return 'system'; } }
+		function applyMode(mode) {
+			var dark = mode === 'dark' || (mode !== 'light' && mq.matches);
+			root.classList.toggle('dark', dark);
+			if (themeMeta) themeMeta.setAttribute('content', dark ? '#0a0a0c' : '#f5f5f7');
+			if (themeBtn) {
+				themeBtn.setAttribute('data-mode', mode);
+				themeBtn.setAttribute('title', 'Erscheinungsbild: ' + LABEL[mode]);
+				themeBtn.setAttribute('aria-label', 'Erscheinungsbild: ' + LABEL[mode] + ' – klicken zum Wechseln');
+			}
+		}
+		if (themeBtn) themeBtn.addEventListener('click', function () {
+			var next = ORDER[(ORDER.indexOf(currentMode()) + 1) % ORDER.length];
+			try { localStorage.setItem('kontor-theme', next); } catch (e) { }
+			applyMode(next);
+		});
+		function onSystemChange() { if (currentMode() === 'system') applyMode('system'); }
+		if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
+		else if (mq.addListener) mq.addListener(onSystemChange);
+		applyMode(currentMode()); // sync icon + title on load
+
+		// ---- mobile: alternate which side each pannable panel is cropped on ----
+		(function () {
+			if (!window.matchMedia('(max-width: 767px)').matches) return;
+			var i = 0;
+			document.querySelectorAll('.pan-x').forEach(function (p) {
+				if (p.scrollWidth <= p.clientWidth) return;    // not overflowing → nothing to crop
+				if (i % 2 === 1) p.scrollLeft = p.scrollWidth; // every other panel reveals its far side
+				i++;
+			});
+		})();
+
+		// ---- copy-on-click for rebuilt UI values (the app's "jede Zahl kopierbar") ----
+		document.addEventListener('click', function (e) {
+			var c = e.target.closest('.copyable');
+			if (!c) return;
+			var t = c.textContent.trim();
+			try { if (navigator.clipboard) navigator.clipboard.writeText(t); } catch (err) { }
+			document.querySelectorAll('.copyable.copied').forEach(function (el) { el.classList.remove('copied'); });
+			c.classList.add('copied');
+			setTimeout(function () { c.classList.remove('copied'); }, 1300);
+		});
+
+		// ---- Kontoauszug triage: book / skip / book-all ----
+		function ktSetOpen(card) {
+			var n = card.querySelectorAll('.kt-row:not(.booked):not(.skipped)').length;
+			var o = card.querySelector('.kt-open'); if (o) o.textContent = n;
+		}
+		function ktBook(row, card) {
+			var st = row.querySelector('.kt-status');
+			if (st) { st.style.color = 'var(--pos)'; st.innerHTML = '✓ gebucht'; }
+			row.classList.add('booked'); ktSetOpen(card);
+		}
+		document.addEventListener('click', function (e) {
+			var b = e.target.closest('.kt-book'), s = e.target.closest('.kt-skip'), a = e.target.closest('.kt-bookall');
+			if (b) { var r = b.closest('.kt-row'); ktBook(r, r.closest('.ui-card')); }
+			else if (s) {
+				var r2 = s.closest('.kt-row'); var st = r2.querySelector('.kt-status');
+				if (st) { st.style.color = 'var(--muted)'; st.textContent = 'übersprungen'; }
+				r2.classList.add('skipped'); ktSetOpen(r2.closest('.ui-card'));
+			} else if (a) {
+				var card = a.closest('.ui-card');
+				var rows = card.querySelectorAll('.kt-row:not(.booked):not(.skipped)');
+				rows.forEach(function (row, i) { setTimeout(function () { ktBook(row, card); }, i * 170); });
+			}
+		});
+
+		// ---- screenshot gallery zoom (shared-element morph via View Transitions) ----
+		(function () {
+			var lb = document.getElementById('lightbox');
+			if (!lb) return;
+			var lbImg = document.getElementById('lb-img');
+			var lbClose = document.getElementById('lb-close');
+			var backdrop = lb.querySelector('.lb-backdrop');
+			var currentThumb = null;
+			var supportsVT = typeof document.startViewTransition === 'function'
+				&& !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			function isDark() { return document.documentElement.classList.contains('dark'); }
+
+			function openZoom(fig) {
+				if (window.matchMedia('(max-width: 767px)').matches) return; // mobile: screenshots are shown large, no lightbox
+				var btn = fig.querySelector('.gal-zoom');
+				var imgs = btn.querySelectorAll('img');
+				var vis = [].filter.call(imgs, function (i) { return getComputedStyle(i).display !== 'none'; })[0] || imgs[0];
+				currentThumb = vis;
+				lbImg.src = fig.getAttribute(isDark() ? 'data-dark' : 'data-light');
+				lbImg.alt = fig.getAttribute('data-caption') || '';
+				var reveal = function () {
+					lb.classList.add('open'); lb.setAttribute('aria-hidden', 'false');
+					document.body.style.overflow = 'hidden'; lbClose.focus();
+				};
+				if (supportsVT) {
+					vis.style.viewTransitionName = 'zoom-img';
+					var t = document.startViewTransition(function () {
+						reveal();
+						lbImg.style.viewTransitionName = 'zoom-img';
+						vis.style.viewTransitionName = '';
+					});
+					// once the morph is done, drop the name again so nothing stays in a transition layer
+					t.finished.finally(function () { lbImg.style.viewTransitionName = ''; });
+				} else { reveal(); }
+			}
+
+			function closeZoom() {
+				var hide = function () {
+					lb.classList.remove('open'); lb.setAttribute('aria-hidden', 'true');
+					document.body.style.overflow = '';
+				};
+				if (supportsVT && currentThumb) {
+					lbImg.style.viewTransitionName = 'zoom-img';
+					var t = document.startViewTransition(function () {
+						hide();
+						currentThumb.style.viewTransitionName = 'zoom-img';
+						lbImg.style.viewTransitionName = '';
+					});
+					t.finished.finally(function () { if (currentThumb) currentThumb.style.viewTransitionName = ''; });
+				} else { hide(); }
+			}
+
+			document.querySelectorAll('.gal-item').forEach(function (fig) {
+				fig.querySelector('.gal-zoom').addEventListener('click', function () { openZoom(fig); });
+			});
+			lbClose.addEventListener('click', closeZoom);
+			backdrop.addEventListener('click', closeZoom);
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && lb.classList.contains('open')) closeZoom();
+			});
+		})();
+
+	</script>
+
+	<script>
+		// ---- legal modal: Impressum / Datenschutz / Nutzungsbedingungen ----
+		(function () {
+			var modal = document.getElementById('legal');
+			if (!modal) return;
+			var title = document.getElementById('legal-title');
+			var scroll = modal.querySelector('.legal-scroll');
+			var sections = modal.querySelectorAll('[data-legal]');
+			var TITLES = { impressum: 'Impressum', datenschutz: 'Datenschutzerklärung', nutzung: 'Nutzungsbedingungen' };
+			var lastFocus = null;
+
+			function open(which) {
+				lastFocus = document.activeElement;
+				sections.forEach(function (s) { s.hidden = s.getAttribute('data-legal') !== which; });
+				title.textContent = TITLES[which] || '';
+				modal.classList.add('open');
+				modal.setAttribute('aria-hidden', 'false');
+				document.body.style.overflow = 'hidden';
+				scroll.scrollTop = 0;
+				var closeBtn = modal.querySelector('[data-legal-close]');
+				if (closeBtn && closeBtn.focus) closeBtn.focus();
+			}
+			function close() {
+				modal.classList.remove('open');
+				modal.setAttribute('aria-hidden', 'true');
+				document.body.style.overflow = '';
+				if (lastFocus && lastFocus.focus) lastFocus.focus();
+			}
+
+			document.querySelectorAll('[data-modal]').forEach(function (btn) {
+				btn.addEventListener('click', function (e) { e.preventDefault(); open(btn.getAttribute('data-modal')); });
+			});
+			modal.querySelectorAll('[data-legal-close]').forEach(function (el) {
+				el.addEventListener('click', close);
+			});
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && modal.classList.contains('open')) close();
+			});
+			// keep keyboard focus inside the dialog while open
+			modal.addEventListener('keydown', function (e) {
+				if (e.key !== 'Tab' || !modal.classList.contains('open')) return;
+				var f = [].slice.call(modal.querySelectorAll('button, a[href], [tabindex]:not([tabindex="-1"])'))
+					.filter(function (el) { return el.offsetParent !== null; });
+				if (!f.length) return;
+				var first = f[0], last = f[f.length - 1];
+				if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+				else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+			});
+		})();
+	</script>
+</body>
+
+</html>
