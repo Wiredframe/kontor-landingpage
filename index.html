@@ -749,7 +749,7 @@
 						<path d="M8 21h8M12 17v4" />
 					</svg>
 				</button>
-				<a href="https://github.com/Wiredframe/Kontor"
+				<a href="#download"
 					class="btn-primary hidden sm:inline-flex items-center gap-2 rounded-full px-4 h-10 text-[.9rem] font-semibold">
 					Kostenlos<span class="opacity-80 font-normal hidden md:inline"> · macOS</span>
 				</a>
@@ -770,7 +770,7 @@
 					ist die Buchhaltungs-App für Freiberufler, die Steuern ernst nimmt und die Cloud verweigert. EÜR,
 					Umsatzsteuer-Voranmeldung, KSK, Rücklagen – alles korrekt, alles lokal auf deinem Mac. </p>
 				<div class="mt-9 flex flex-wrap items-center justify-center gap-3">
-					<a href="https://github.com/Wiredframe/Kontor"
+					<a href="#download"
 						class="btn-primary inline-flex items-center gap-2.5 rounded-full px-6 h-[3.25rem] text-[1rem] font-semibold">
 						Kostenlos für macOS
 					</a>
@@ -2576,50 +2576,6 @@
 				</div>
 			</div>
 		</section>
-		<!-- ============ §10b SPENDEN ============ -->
-		<section id="spenden" class="py-24 sm:py-32" style="background:var(--bg-2)">
-			<div class="mx-auto max-w-7xl px-5 sm:px-8">
-				<div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-					<!-- links: Text -->
-					<div class="reveal max-w-xl">
-						<span class="eyebrow">Spenden</span>
-						<h2
-							class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
-							Kontor ist kostenlos. Bleibt es auch. </h2>
-						<p class="mt-5 leading-relaxed text-[1.06rem]" style="color:var(--ink-2)">Kontor ist
-							„source-available“ und kostet dich nichts. Wenn dir die App den Monatsabschluss abnimmt,
-							freue ich mich über eine Spende – <strong style="color:var(--ink)">freiwillig und ohne
-							Gegenleistung</strong>. Sie hilft, Kontor weiterzupflegen.</p>
-						<p class="mt-4 text-[.92rem]" style="color:var(--muted)">Keine Mitgliedschaft, kein Abo, keine
-							Vorteile im Gegenzug – einfach ein Dankeschön, wenn dir Kontor die Buchhaltung leichter
-							macht.</p>
-					</div>
-					<!-- rechts: Spenden-Karte -->
-					<div class="reveal d1 rounded-3xl p-8 sm:p-10"
-						style="background:var(--surface);border:1px solid var(--hair);box-shadow:var(--shadow)">
-						<span class="eyebrow normal-case tracking-[.05em]">Betrag selbst wählen</span>
-						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)">Du gibst, was dir Kontor wert ist –
-							einmalig, ohne Abo. Die Zahlung läuft sicher über Stripe, ganz ohne Konto.</p>
-						<a data-donate href="#spenden"
-							class="btn-primary mt-7 inline-flex items-center justify-center gap-2 rounded-full px-6 h-[3.25rem] w-full text-[1rem] font-semibold">
-							<svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-								stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<path
-									d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-							</svg> Jetzt spenden </a>
-						<div class="mt-6 flex flex-wrap items-center gap-2" style="color:var(--muted)">
-							<span class="pill rounded-full px-3 py-1 text-[.8rem]">Kreditkarte</span>
-							<span class="pill rounded-full px-3 py-1 text-[.8rem]">SEPA-Lastschrift</span>
-							<span class="pill rounded-full px-3 py-1 text-[.8rem]">Wero <span
-									style="color:var(--brand)">· neu</span></span>
-						</div>
-						<p class="mt-5 text-[.82rem] leading-relaxed" style="color:var(--muted)">Wero wird gerade
-							ausgerollt und erscheint, sobald es für deine Region verfügbar ist – Karte und
-							SEPA-Lastschrift gehen schon heute.</p>
-					</div>
-				</div>
-			</div>
-		</section>
 		<!-- ============ §11 SCHLUSS-CTA ============ -->
 		<section id="download" class="px-5 sm:px-8 pb-24 sm:pb-32">
 			<div class="reveal relative mx-auto max-w-7xl rounded-[2rem] overflow-hidden text-center px-6 py-20 sm:py-28"
@@ -2645,6 +2601,51 @@
 						Nicht signiert – beim ersten Start Rechtsklick aufs App-Icon → „Öffnen“.
 						<a href="https://github.com/Wiredframe/Kontor#installation" class="underline underline-offset-2 hover:text-white">Kurzanleitung</a>
 					</p>
+				</div>
+			</div>
+		</section>
+		<!-- ============ §11b SPENDEN (unter CTA) ============ -->
+		<section id="spenden" class="py-24 sm:py-32">
+			<div class="mx-auto max-w-7xl px-5 sm:px-8">
+				<div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+					<!-- links: Text -->
+					<div class="reveal max-w-xl">
+						<span class="eyebrow">Spenden</span>
+						<h2
+							class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+							Kontor ist kostenlos. Bleibt es auch. </h2>
+						<p class="mt-5 leading-relaxed text-[1.06rem]" style="color:var(--ink-2)">Kontor ist
+							„source-available“ und kostet dich nichts. Wenn dir die App den Monatsabschluss abnimmt,
+							freue ich mich über eine Spende – <strong style="color:var(--ink)">freiwillig und ohne
+							Gegenleistung</strong>. Sie hilft, Kontor weiterzupflegen.</p>
+						<p class="mt-4 text-[.92rem]" style="color:var(--muted)">Keine Mitgliedschaft, kein Abo, keine
+							Vorteile im Gegenzug – einfach ein Dankeschön, wenn dir Kontor die Buchhaltung leichter
+							macht.</p>
+					</div>
+					<!-- rechts: Spenden-Karte -->
+					<div class="reveal d1 relative rounded-3xl p-8 sm:p-10 overflow-hidden"
+						style="background:var(--surface);border:1px solid color-mix(in srgb,var(--brand) 40%,var(--hair));box-shadow:var(--shadow)">
+						<div class="absolute inset-x-0 top-0 h-1" style="background:linear-gradient(90deg,var(--brand-blue),var(--brand-2))"></div>
+						<span class="eyebrow normal-case tracking-[.05em]">Betrag selbst wählen</span>
+						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)">Du gibst, was dir Kontor wert ist –
+							einmalig, ohne Abo. Die Zahlung läuft sicher über Stripe, ganz ohne Konto.</p>
+						<a data-donate href="#spenden"
+							class="btn-primary mt-7 inline-flex items-center justify-center gap-2 rounded-full px-6 h-[3.25rem] w-full text-[1rem] font-semibold">
+							<svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path
+									d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+							</svg> Jetzt spenden </a>
+						<div class="mt-6 flex flex-wrap items-center gap-2" style="color:var(--muted)">
+							<span class="pill rounded-full px-3 py-1 text-[.8rem]">Kreditkarte</span>
+							<span class="pill rounded-full px-3 py-1 text-[.8rem]">SEPA-Lastschrift</span>
+							<span class="pill rounded-full px-3 py-1 text-[.8rem]">Wero <span
+									style="color:var(--brand)">· neu</span></span>
+						</div>
+						<p class="mt-5 text-[.82rem] leading-relaxed" style="color:var(--muted)">Wero wird gerade
+							ausgerollt und erscheint, sobald es für deine Region verfügbar ist – Karte und
+							SEPA-Lastschrift gehen schon heute.</p>
+					</div>
 				</div>
 			</div>
 		</section>
