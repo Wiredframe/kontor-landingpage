@@ -23,29 +23,27 @@
 			} catch (e) { }
 		})();
 	</script>
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..600&display=swap"
-		rel="stylesheet" />
-	<script src="https://cdn.tailwindcss.com"></script>
-	<script>
-		tailwind.config = {
-			darkMode: 'class',
-			theme: {
-				extend: {
-					fontFamily: {
-						display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-						sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-						mono: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-					},
-					colors: {
-						brand: { 400: '#7CA3F7', 500: '#5690F4', 600: '#5E63EA', 700: '#6C38E0' },
-					},
-				},
-			},
-		};
-	</script>
+	<!-- Schrift „Plus Jakarta Sans" selbst gehostet (assets/fonts/, @font-face im <style>) – kein Google-Fonts-Request mehr. -->
+	<!-- Tailwind statisch vorkompiliert -> assets/tailwind.css (Build: npm run build:css). Frühere Play-CDN entfernt; Config liegt jetzt in tailwind.config.js. Das <link> steht bewusst NACH dem Inline-<style> (gleiche Kaskade wie zuvor die CDN, Utilities gewinnen Gleichstände). -->
 	<style>
+		/* Plus Jakarta Sans – selbst gehostet (ersetzt Google Fonts). font-display:optional = kein Layout-Shift durch Font-Swap. Variable 400–800, kein Italic (ungenutzt). */
+		@font-face {
+			font-family: 'Plus Jakarta Sans';
+			font-style: normal;
+			font-weight: 400 800;
+			font-display: optional;
+			src: url(assets/fonts/plus-jakarta-sans-latin.woff2) format('woff2');
+			unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+		}
+		@font-face {
+			font-family: 'Plus Jakarta Sans';
+			font-style: normal;
+			font-weight: 400 800;
+			font-display: optional;
+			src: url(assets/fonts/plus-jakarta-sans-latin-ext.woff2) format('woff2');
+			unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+		}
+
 		:root {
 			--bg: #f5f5f7;
 			--bg-2: #ececef;
@@ -556,6 +554,7 @@
 		.gal-img {
 			width: 100%;
 			height: auto;
+			aspect-ratio: 1500 / 980;
 			border-radius: 16px;
 		}
 
@@ -707,6 +706,7 @@
 			text-underline-offset: 2px;
 		}
 	</style>
+	<link rel="stylesheet" href="assets/tailwind.css" />
 </head>
 
 <body class="font-sans antialiased">
@@ -2765,16 +2765,14 @@
 						abgerufene Datei, übertragene Datenmenge, Referrer, Browser- und Betriebssystem-Kennung).
 						Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einem sicheren,
 						stabilen Betrieb). Eine Zusammenführung dieser Daten mit Ihrer Person erfolgt nicht.</p>
-					<h3>3. Schriftarten (Google Fonts)</h3>
-					<p>Zur einheitlichen Darstellung lädt diese Seite die Schrift „Plus&nbsp;Jakarta&nbsp;Sans" über
-						Google Fonts (Google Ireland Ltd. / Google LLC, USA). Dabei wird Ihre IP-Adresse an Google
-						übertragen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Details: <a
-							href="https://policies.google.com/privacy" target="_blank"
-							rel="noopener">policies.google.com/privacy</a>. </p>
-					<h3>4. Tailwind CSS (CDN)</h3>
-					<p>Für das Layout wird die Bibliothek „Tailwind&nbsp;CSS" über ein Content Delivery Network
-						(cdn.tailwindcss.com) geladen. Auch dabei wird Ihre IP-Adresse an den jeweiligen Anbieter
-						übertragen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.</p>
+					<h3>3. Schriftarten (selbst gehostet)</h3>
+					<p>Die Schrift „Plus&nbsp;Jakarta&nbsp;Sans" wird direkt von diesem Server ausgeliefert
+						(self-hosted). Es wird <strong>kein</strong> externer Dienst wie Google&nbsp;Fonts eingebunden;
+						es werden dabei keine Daten – insbesondere nicht Ihre IP-Adresse – an Dritte übertragen.</p>
+					<h3>4. CSS / Tailwind (selbst gehostet)</h3>
+					<p>Das Stylesheet (u.&nbsp;a. vorkompiliertes „Tailwind&nbsp;CSS") wird ebenfalls lokal von diesem
+						Server ausgeliefert. Es wird <strong>kein</strong> Content Delivery Network (etwa
+						cdn.tailwindcss.com) eingebunden; es werden keine Daten an Dritte übertragen.</p>
 					<h3>5. Lokale Speicherung (localStorage)</h3>
 					<p>Ihre Auswahl des Erscheinungsbilds (Hell/Dunkel/System) wird ausschließlich lokal in Ihrem
 						Browser gespeichert. Diese Information verlässt Ihr Gerät nicht und wird nicht an uns
@@ -3109,25 +3107,6 @@
 					a.title = "Spenden-Link wird in Kürze freigeschaltet";
 				}
 			});
-		})();
-	</script>
-	<script>
-		// Direktlinks (#anchor): Nach vollständigem Laden – inkl. Web-Font-Swap und
-		// Bilder – erneut sauber zur Ziel-Section springen. Ohne das verschiebt der
-		// nachträgliche Layout-Shift den Ankerpunkt, und man landet oberhalb der
-		// Section (muss „weiter runter" scrollen). Betrifft nur das Laden MIT Hash;
-		// In-Page-Klicks laufen weiter nativ (smooth + scroll-padding-top).
-		(function () {
-			if (!location.hash || location.hash.length < 2) return;
-			function fixAnchor() {
-				var el;
-				try { el = document.querySelector(location.hash); } catch (e) { return; }
-				if (!el) return;
-				var pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
-				window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - pad, behavior: 'auto' });
-			}
-			window.addEventListener('load', fixAnchor);
-			if (document.fonts && document.fonts.ready) document.fonts.ready.then(fixAnchor);
 		})();
 	</script>
 </body>

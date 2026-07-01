@@ -3,3 +3,6 @@
 
 # Local dev tooling (Claude Code preview server config)
 .claude/
+
+# Node / Tailwind build (assets/tailwind.css IS committed; node_modules is not)
+node_modules/
