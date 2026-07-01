@@ -3111,6 +3111,25 @@
 			});
 		})();
 	</script>
+	<script>
+		// Direktlinks (#anchor): Nach vollständigem Laden – inkl. Web-Font-Swap und
+		// Bilder – erneut sauber zur Ziel-Section springen. Ohne das verschiebt der
+		// nachträgliche Layout-Shift den Ankerpunkt, und man landet oberhalb der
+		// Section (muss „weiter runter" scrollen). Betrifft nur das Laden MIT Hash;
+		// In-Page-Klicks laufen weiter nativ (smooth + scroll-padding-top).
+		(function () {
+			if (!location.hash || location.hash.length < 2) return;
+			function fixAnchor() {
+				var el;
+				try { el = document.querySelector(location.hash); } catch (e) { return; }
+				if (!el) return;
+				var pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+				window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - pad, behavior: 'auto' });
+			}
+			window.addEventListener('load', fixAnchor);
+			if (document.fonts && document.fonts.ready) document.fonts.ready.then(fixAnchor);
+		})();
+	</script>
 </body>
 
 </html>
