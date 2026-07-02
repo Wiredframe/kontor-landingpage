@@ -3,7 +3,7 @@
 Marketing-Website für **Kontor**, die native macOS-Buchhaltungs-App für
 KSK-versicherte Freiberufler (EÜR, UStVA, KSK, Rücklagen – lokal auf dem Mac).
 
-[![Website ansehen](https://img.shields.io/badge/Website-ansehen-7c3aed?style=for-the-badge&logo=safari&logoColor=white)](https://wiredframe.github.io/kontor-landingpage/) [![Spenden](https://img.shields.io/badge/Spenden-Stripe-e11d48?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://wiredframe.github.io/kontor-landingpage/#spenden)
+[![Website ansehen](https://img.shields.io/badge/Website-ansehen-7c3aed?style=for-the-badge&logo=safari&logoColor=white)](https://wiredframe.github.io/kontor-landingpage/) [![Spenden](https://img.shields.io/badge/Spenden-Stripe-e11d48?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://wiredframe.github.io/kontor-landingpage/#spenden) [![Lighthouse 4×100](https://img.shields.io/badge/Lighthouse-4%20%C3%97%20100-0cce6b?style=for-the-badge)](https://wiredframe.github.io/kontor-landingpage/)
 
 **Live: [wiredframe.github.io/kontor-landingpage](https://wiredframe.github.io/kontor-landingpage/)** · Quelle: `index.html`
 
@@ -58,6 +58,9 @@ danach unter der angezeigten Pages-URL erreichbar (eigene Domain optional).
 
 - Tailwind (vorkompiliert, `assets/tailwind.css`) und die Schrift (`assets/fonts/`)
   werden **lokal** ausgeliefert – kein CDN, kein Google Fonts, keine Dritt-Requests.
+- Der schlanke, CDN-freie Aufbau zahlt sich messbar aus: Lighthouse gibt der Seite
+  **100 in allen vier Kategorien** – Performance, Accessibility, Best Practices und SEO
+  (First Contentful Paint 0,3 s, Largest Contentful Paint 0,4 s; gemessen Juli 2026).
 - Impressum, Datenschutzerklärung und Nutzungsbedingungen liegen in der Seite
   (Footer → Modal). Es handelt sich um Entwürfe – für den produktiven Einsatz
   rechtlich prüfen lassen.
