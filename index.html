@@ -353,6 +353,21 @@
 			}
 		}
 
+		/* ---- Header · initial transparent auf dem Hero, Hintergrund + Schatten erst beim Scrollen ---- */
+		.site-header {
+			border-bottom: 1px solid transparent;
+			/* immer 1px → kein Layout-Shift beim Einblenden der Border */
+			transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease;
+		}
+
+		.site-header.scrolled {
+			background: color-mix(in srgb, var(--bg) 72%, transparent);
+			border-bottom-color: var(--hair);
+			-webkit-backdrop-filter: blur(20px);
+			backdrop-filter: blur(20px);
+			box-shadow: 0 8px 24px -16px rgba(0, 0, 0, .4);
+		}
+
 		details.faq {
 			border-bottom: 1px solid var(--hair);
 		}
@@ -752,8 +767,7 @@
 	<div class="progress fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left"
 		style="transform:scaleX(0);background:linear-gradient(90deg,var(--brand-blue),var(--brand-2))"></div>
 	<!-- ============ HEADER ============ -->
-	<header class="fixed top-0 inset-x-0 z-50 backdrop-blur-xl"
-		style="background:color-mix(in srgb,var(--bg) 72%,transparent);border-bottom:1px solid var(--hair)">
+	<header class="site-header fixed top-0 inset-x-0 z-50">
 		<div class="mx-auto max-w-7xl px-5 sm:px-8 h-[4.25rem] flex items-center justify-between gap-4">
 			<a href="#top" class="flex items-center gap-2.5 shrink-0">
 				<img src="assets/AppIcon-512.png" alt="Kontor App-Icon" class="w-8 h-8 rounded-[9px] shadow-sm" />
@@ -802,7 +816,7 @@
 				<!-- App-Icon · springende Münze (Auto-Play 1×, danach per Klick/Tap wiederholbar) -->
 				<div class="hero-appicon-wrap flex justify-center">
 					<img src="assets/AppIcon-512.png" alt="Kontor App-Icon"
-						class="hero-appicon w-24 h-24 sm:w-28 sm:h-28" />
+						class="hero-appicon w-28 h-28 sm:w-32 sm:h-32" />
 				</div>
 				<h1
 					class="font-display font-extrabold mt-6 mx-auto max-w-[18ch] text-[clamp(2.5rem,6.2vw,4.75rem)] leading-[1.02] text-balance">
@@ -3301,6 +3315,17 @@
 			if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 				setTimeout(play, 2000);
 			}
+		})();
+
+		// ---- Header · Hintergrund + Schatten erst beim Scrollen einblenden ----
+		(function () {
+			var header = document.querySelector('.site-header');
+			if (!header) return;
+			function onScroll() {
+				header.classList.toggle('scrolled', window.scrollY > 8);
+			}
+			onScroll();                                         // Startzustand direkt setzen (z. B. bei Reload mit Offset)
+			window.addEventListener('scroll', onScroll, { passive: true });
 		})();
 	</script>
 </body>
