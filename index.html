@@ -54,9 +54,10 @@
 			--ink-2: #3a3a3e;
 			--muted: #6e6e73;
 			--hair: rgba(0, 0, 0, .09);
-			--brand: #5b62ee;
-			--brand-2: #6c38e0;
-			--brand-blue: #5690f4;
+			/* Eine solide Markenfarbe statt Blau→Lila-Verlauf. --brand-2/--brand-blue sind Altnamen, zeigen bewusst auf dieselbe Farbe. */
+			--brand: #2463EB;
+			--brand-2: #2463EB;
+			--brand-blue: #2463EB;
 			--pos: #128a5c;
 			--neg: #c0392f;
 			--shadow: 0 30px 60px -24px rgba(28, 28, 40, .28), 0 8px 24px -16px rgba(28, 28, 40, .20);
@@ -77,9 +78,10 @@
 			--ink-2: #d7d7dc;
 			--muted: #9a9aa1;
 			--hair: rgba(255, 255, 255, .11);
-			--brand: #8b93ff;
-			--brand-2: #a273ff;
-			--brand-blue: #7fb0ff;
+			/* Dunkel: dieselbe Markenfarbe, nur aufgehellt für Lesbarkeit auf dunklem Grund. */
+			--brand: #5b8def;
+			--brand-2: #5b8def;
+			--brand-blue: #5b8def;
 			--pos: #41d692;
 			--neg: #ff6b5e;
 			--shadow: 0 40px 80px -28px rgba(0, 0, 0, .7), 0 10px 30px -18px rgba(0, 0, 0, .6);
@@ -130,10 +132,7 @@
 		}
 
 		.brand-text {
-			background: linear-gradient(100deg, var(--brand-blue), var(--brand-2));
-			-webkit-background-clip: text;
-			background-clip: text;
-			color: transparent;
+			color: var(--brand);
 		}
 
 		.hairline {
@@ -180,9 +179,9 @@
 
 		/* CTA */
 		.btn-primary {
-			background: linear-gradient(120deg, var(--brand-blue), var(--brand-2));
+			background: #2463EB;
 			color: #fff;
-			box-shadow: 0 10px 26px -10px color-mix(in srgb, var(--brand) 70%, transparent);
+			box-shadow: 0 10px 26px -10px color-mix(in srgb, #2463EB 70%, transparent);
 		}
 
 		.btn-primary:hover {
@@ -389,10 +388,24 @@
 			transform: rotate(45deg);
 		}
 
+		/* Marketing-Pills sind entfernt; verbliebene In-Mockup-Chips (Filter, Preis-Badge) ohne Outline, nur mit Fill. */
 		.pill {
-			border: 1px solid var(--hair);
 			color: var(--muted);
-			background: color-mix(in srgb, var(--surface) 55%, transparent);
+			background: color-mix(in srgb, var(--ink) 6%, transparent);
+		}
+
+		/* Card-Outlines raus: Inhalts-Karten definieren sich über Fill + weichen Schatten, nicht über Rahmen.
+		   !important überschreibt die Inline-border-Deklarationen der einzelnen Karten. Mockup-interne Rahmen
+		   (in .ui-card/.hero-window) sind hiervon nicht betroffen und bleiben erhalten. */
+		.reveal.rounded-xl,
+		.reveal.rounded-2xl,
+		.reveal.rounded-3xl {
+			border: 0 !important;
+		}
+
+		.reveal.rounded-2xl,
+		.reveal.rounded-3xl {
+			box-shadow: var(--shadow-soft);
 		}
 
 		/* ---- Native UI excerpts (rebuilt app panels) ---- */
@@ -765,7 +778,7 @@
 <body class="font-sans antialiased">
 	<!-- scroll progress -->
 	<div class="progress fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left"
-		style="transform:scaleX(0);background:linear-gradient(90deg,var(--brand-blue),var(--brand-2))"></div>
+		style="transform:scaleX(0);background:#2463EB"></div>
 	<!-- ============ HEADER ============ -->
 	<header class="site-header fixed top-0 inset-x-0 z-50">
 		<div class="mx-auto max-w-7xl px-5 sm:px-8 h-[4.25rem] flex items-center justify-between gap-4">
@@ -819,13 +832,9 @@
 						class="hero-appicon w-28 h-28 sm:w-32 sm:h-32" />
 				</div>
 				<h1
-					class="font-display font-extrabold mt-6 mx-auto max-w-[18ch] text-[clamp(2.5rem,6.2vw,4.75rem)] leading-[1.02] text-balance">
-					Buchhaltung, die rechnet wie dein Steuerberater – und schweigt wie ein <span
-						class="brand-text">Tresor</span>. </h1>
-				<p class="mt-6 mx-auto max-w-[52ch] text-[1.12rem] leading-relaxed" style="color:var(--muted)"> Kontor
-					ist die Buchhaltungs-App für KSK-versicherte Kreative mit Regelbesteuerung, die Steuern ernst nimmt
-					und die Cloud verweigert. EÜR, Umsatzsteuer-Voranmeldung, KSK, Rücklagen – egal ob du mit 7&nbsp;%,
-					19&nbsp;% oder beidem fakturierst. Alles korrekt, alles lokal auf deinem Mac. </p>
+					class="font-display font-extrabold mt-6 mx-auto max-w-[16ch] text-[clamp(2.5rem,6.2vw,4.75rem)] leading-[1.02] text-balance">
+					Rechnet wie dein Steuerberater. Schweigt wie ein <span class="brand-text">Tresor</span>. </h1>
+				<p class="mt-6 mx-auto max-w-[42ch] font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Native Mac-Buchhaltung für <span class="brand-text">KSK-versicherte Kreative</span>. EÜR, UStVA, KSK und Rücklagen, steuerlich korrekt und lokal auf deinem Mac. </p>
 				<div class="mt-9 flex flex-wrap items-center justify-center gap-3">
 					<a href="https://apps.apple.com/app/kontor-buchhaltung/id6788498504" target="_blank" rel="noopener"
 						class="btn-primary inline-flex items-center gap-2.5 rounded-full px-6 h-[3.25rem] text-[1rem] font-semibold">
@@ -843,7 +852,7 @@
 						</svg>
 					</a>
 				</div>
-				<p class="eyebrow justify-center mt-6 normal-case tracking-[.04em]" style="font-size:.74rem">
+				<p class="mt-6 text-center font-medium tracking-wide" style="font-size:.8rem;color:var(--muted)">
 					Kostenlos&nbsp;·&nbsp;Source&nbsp;Available&nbsp;·&nbsp;keine Cloud&nbsp;·&nbsp;macOS&nbsp;15+ </p>
 				<!-- hero screenshot -->
 				<div class="hero-rise mt-14 sm:mt-16">
@@ -1021,27 +1030,27 @@
 											class="mt-4 flex items-end gap-1.5 sm:gap-2 h-28 sm:h-32 lg:h-auto lg:flex-1 lg:min-h-0">
 											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
 													class="hw-bar rounded-t"
-													style="height:82%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+													style="height:82%;background:#2463EB"></span>
 											</div>
 											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
 													class="hw-bar rounded-t"
-													style="height:86%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+													style="height:86%;background:#2463EB"></span>
 											</div>
 											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
 													class="hw-bar rounded-t"
-													style="height:82%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+													style="height:82%;background:#2463EB"></span>
 											</div>
 											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
 													class="hw-bar rounded-t"
-													style="height:96%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+													style="height:96%;background:#2463EB"></span>
 											</div>
 											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
 													class="hw-bar rounded-t"
-													style="height:88%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+													style="height:88%;background:#2463EB"></span>
 											</div>
 											<div class="hw-col flex-1 flex flex-col justify-end h-full"><span
 													class="hw-bar rounded-t"
-													style="height:86%;background:linear-gradient(180deg,#3ddc84,#1aa45f)"></span>
+													style="height:86%;background:#2463EB"></span>
 											</div>
 											<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
 													style="height:6%;background:var(--bg-2)"></span></div>
@@ -1083,28 +1092,19 @@
 						</div>
 					</div>
 				</div>
-				<!-- trust pills -->
-				<div class="mt-9 flex flex-wrap items-center justify-center gap-2.5 text-[.8rem]">
-					<span class="pill rounded-full px-3.5 py-1.5">100&nbsp;% lokal</span>
-					<span class="pill rounded-full px-3.5 py-1.5">Kein Konto, kein Login</span>
-					<span class="pill rounded-full px-3.5 py-1.5">App-Sandbox aktiv</span>
-					<span class="pill rounded-full px-3.5 py-1.5">Source-available</span>
-					<span class="pill rounded-full px-3.5 py-1.5">Cent-genau mit <span class="num">Decimal</span></span>
-				</div>
 			</div>
 		</section>
 		<!-- ============ §3 FREI VERFÜGBAR (Signature) ============ -->
 		<section id="frei" class="py-24 sm:py-32" style="background:var(--bg-2)">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<span class="eyebrow">Das Herzstück</span>
 					<h2
-						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Auf dem Konto liegen 6.000 €. Wie viel davon gehört wirklich <span
 							class="brand-text">dir</span>? </h2>
-					<p class="mt-6 text-[1.12rem] leading-relaxed" style="color:var(--ink-2)"> Genau das rechnet Kontor
-						– Monat für Monat als Wasserfall vom Brutto bis zur einzigen Zahl, die zählt. Keine Schätzung
-						aus dem Bauch, keine böse Überraschung am Quartalsende. </p>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Kontor rechnet es dir
+						vor: als Wasserfall vom Brutto bis zu <span class="brand-text">der einen Zahl, die zählt</span>.
+						Kein Bauchgefühl, keine böse Überraschung zum Quartalsende. </p>
 				</div>
 				<div class="mt-14 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
 					<!-- the waterfall -->
@@ -1216,34 +1216,25 @@
 		<section id="alltag" class="py-24 sm:py-32">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<span class="eyebrow">Dein Monat · zwei Handgriffe</span>
 					<h2
-						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Belege rein. Kontoauszug rein. <span class="brand-text">Fertig.</span>
 					</h2>
-					<p class="mt-6 text-[1.12rem] leading-relaxed" style="color:var(--ink-2)"> Der mühsamste Teil jeder
-						Buchhaltung ist die Dateneingabe. In Kontor sind es zwei Handgriffe im Monat – den Rest
-						erledigen OCR und ein CSV-Import. Für Einnahmen wie Ausgaben. </p>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Der mühsamste Teil der
+						Buchhaltung ist die Dateneingabe. In Kontor sind es <span class="brand-text">zwei Handgriffe im
+						Monat</span>, den Rest erledigen OCR und CSV-Import. Für Einnahmen wie Ausgaben. </p>
 				</div>
 				<!-- Handgriff 1 · Belege + OCR -->
 				<div class="mt-16 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
 					<div class="reveal">
 						<div class="flex items-center gap-3">
-							<span class="num grid place-items-center w-8 h-8 rounded-full text-[.9rem] font-bold"
+							<span class="num grid place-items-center w-8 h-8 rounded-full text-[.9rem] font-bold shrink-0"
 								style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">1</span>
-							<span class="eyebrow normal-case tracking-[.05em]">Belege &amp; OCR</span>
+							<h3 class="font-display text-[1.9rem] font-bold leading-tight">Belege reinziehen, erfasst.</h3>
 						</div>
-						<h3 class="font-display text-[1.9rem] font-bold mt-4 leading-tight">Mehrere PDFs reinziehen –
-							erfasst.</h3>
-						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> Zieh beliebig viele PDFs oder Fotos
-							auf einmal hinein – egal ob Eingangs- oder Ausgangsbeleg. Die OCR (Apple Vision) liest
-							<strong style="color:var(--ink)">Datum, Betrag und Anbieter</strong> aus, hängt jeden Beleg
-							an den passenden Eintrag und legt fehlende gleich an. Kein Abtippen, kein Sortieren. </p>
-						<div class="mt-5 flex flex-wrap gap-2">
-							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Eingang &amp; Ausgang</span>
-							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Apple-Vision-OCR</span>
-							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Inline-Vorschau</span>
-						</div>
+						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> Zieh beliebig viele PDFs oder Fotos
+							auf einmal hinein, egal ob Eingang oder Ausgang. Apple Vision liest <span class="brand-text">Datum, Betrag und Anbieter</span>, hängt jeden Beleg an den
+							passenden Eintrag und legt fehlende an. Kein Abtippen, kein Sortieren. </p>
 					</div>
 					<!-- OCR mock -->
 					<div class="reveal d1">
@@ -1457,22 +1448,13 @@
 					</div>
 					<div class="reveal d1 order-1 lg:order-2">
 						<div class="flex items-center gap-3">
-							<span class="num grid place-items-center w-8 h-8 rounded-full text-[.9rem] font-bold"
+							<span class="num grid place-items-center w-8 h-8 rounded-full text-[.9rem] font-bold shrink-0"
 								style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">2</span>
-							<span class="eyebrow normal-case tracking-[.05em]">Kontoauszug-Abgleich</span>
+							<h3 class="font-display text-[1.9rem] font-bold leading-tight">Kontoauszug einmal im Monat.</h3>
 						</div>
-						<h3 class="font-display text-[1.9rem] font-bold mt-4 leading-tight">Einmal im Monat: CSV
-							importieren.</h3>
-						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> Lade den CSV-Export (CAMT) deiner
-							Sparkasse hoch. Kontor ordnet jede Buchung zu und lernt deine Händler und Gläubiger. Schon
-							vorhandene Einträge erkennt es wieder und aktualisiert nur <strong
-								style="color:var(--ink)">Status und Zahldatum</strong> – nichts doppelt, nichts von
-							Hand. </p>
-						<div class="mt-5 flex flex-wrap gap-2">
-							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Sparkasse · CSV-CAMT</span>
-							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Lernt Händler &amp; Gläubiger</span>
-							<span class="pill rounded-lg px-2.5 py-1 text-[.8rem]">Idempotent · kein Doppelimport</span>
-						</div>
+						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> Lade den CSV-Export (CAMT) deiner
+							Sparkasse hoch. Kontor ordnet jede Buchung zu und lernt deine Händler und Gläubiger.
+							Bekanntes erkennt es wieder und aktualisiert nur <span class="brand-text">Status und Zahldatum</span>. Nichts doppelt, nichts von Hand. </p>
 					</div>
 				</div>
 			</div>
@@ -1481,31 +1463,26 @@
 		<section id="problem" class="py-24 sm:py-32">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<span class="eyebrow">Der Schmerz</span>
 					<h2
-						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Dieselbe Rechnung, zwei Wahrheiten. </h2>
-					<p class="mt-6 text-[1.12rem] leading-relaxed" style="color:var(--ink-2)"> Tabellenkalkulation am
-						Quartalsende. Steuer-Tools, die alles können – nur nicht <em>deinen</em> Fall. Cloud-Dienste,
-						die deine Umsätze auf fremden Servern parken. Wenn du freiberuflich arbeitest, KSK-versichert
-						bist, deine EÜR selbst machst und quartalsweise eine UStVA abgibst, kennst du das: </p>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Tabellen am Quartalsende.
+						Steuer-Tools, die alles können, nur nicht <span class="brand-text">deinen</span> Fall. Cloud-Dienste, die deine Umsätze
+						auf fremden Servern parken. Freiberuflich, KSK-versichert, EÜR selbst, quartalsweise UStVA?
+						<span class="brand-text">Dann kennst du das:</span> </p>
 				</div>
 				<div class="mt-12 grid md:grid-cols-3 gap-5">
 					<div class="reveal rounded-2xl p-7" style="background:var(--surface);border:1px solid var(--hair)">
 						<div class="num text-[.8rem]" style="color:var(--brand)">01</div>
 						<p class="mt-3 leading-relaxed" style="color:var(--ink-2)"> Die USt richtet sich nach dem
-							<strong style="color:var(--ink)">Rechnungsdatum</strong>, dein Gewinn nach dem <strong
-								style="color:var(--ink)">Zahlungseingang</strong> – dieselbe Rechnung, zwei Wahrheiten.
+							<span class="brand-text">Rechnungsdatum</span>, dein Gewinn nach dem <span class="brand-text">Zahlungseingang</span>, dieselbe Rechnung, zwei Wahrheiten.
 							Kein Tool denkt das mit. </p>
 					</div>
 					<div class="reveal d1 rounded-2xl p-7"
 						style="background:var(--surface);border:1px solid var(--hair)">
 						<div class="num text-[.8rem]" style="color:var(--brand)">02</div>
 						<p class="mt-3 leading-relaxed" style="color:var(--ink-2)">
-							<strong style="color:var(--ink)">Reverse-Charge</strong>, <strong
-								style="color:var(--ink)">Forderungsausfall</strong>, <strong
-								style="color:var(--ink)">KSK-Beitrag</strong>, <strong
-								style="color:var(--ink)">ESt-Rücklage</strong> – Sonderfälle, die Standard-Software
+							<span class="brand-text">Reverse-Charge</span>, <span class="brand-text">Forderungsausfall</span>, <span class="brand-text">KSK-Beitrag</span>, <span class="brand-text">ESt-Rücklage</span>. Sonderfälle, die Standard-Software
 							ignoriert oder hinter 200 Buchungskonten versteckt.
 						</p>
 					</div>
@@ -1513,7 +1490,7 @@
 						style="background:var(--surface);border:1px solid var(--hair)">
 						<div class="num text-[.8rem]" style="color:var(--brand)">03</div>
 						<p class="mt-3 leading-relaxed" style="color:var(--ink-2)"> Und am Ende tippst du die Zahlen
-							doch wieder von Hand ins <strong style="color:var(--ink)">ELSTER-Formular</strong>. </p>
+							doch wieder von Hand ins <span class="brand-text">ELSTER-Formular</span>. </p>
 					</div>
 				</div>
 				<p
@@ -1539,8 +1516,8 @@
 						</div>
 						<h3 class="font-display text-[1.5rem] font-bold mt-5">Rechnet steuerlich richtig</h3>
 						<p class="mt-3 leading-relaxed" style="color:var(--muted)"> Nicht „auch Buchhaltung“, sondern
-							<strong style="color:var(--ink-2)">deine</strong>: Soll-Versteuerung, Zuflussprinzip, §13b,
-							§17, KSK, pauschale ESt-Rücklage. Die Logik steckt in einer getesteten Engine – Schritt für
+							<span class="brand-text">deine</span>: Soll-Versteuerung, Zuflussprinzip, §13b,
+							§17, KSK, pauschale ESt-Rücklage. Die Logik steckt in einer getesteten Engine, Schritt für
 							Schritt gegen nachrechenbare Werte geprüft. </p>
 					</div>
 					<!-- card 2 -->
@@ -1556,9 +1533,9 @@
 						</div>
 						<h3 class="font-display text-[1.5rem] font-bold mt-5">Bleibt bei dir</h3>
 						<p class="mt-3 leading-relaxed" style="color:var(--muted)">
-							<strong style="color:var(--ink-2)">Local-first, offline, Sandbox an.</strong> Deine Umsätze
+							<span class="brand-text">Local-first, offline, Sandbox an.</span> Deine Umsätze
 							verlassen den Mac nicht. Kein Konto, kein Login, kein Tracking. Backup liegt als Datei in
-							deinem Ordner – nicht in fremder Hand.
+							deinem Ordner, nicht in fremder Hand.
 						</p>
 					</div>
 					<!-- card 3 -->
@@ -1584,22 +1561,23 @@
 		<section id="besonders" class="py-24 sm:py-32">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<span class="eyebrow">Besonderheiten</span>
 					<h2
-						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Die Sonderfälle, die sonst niemand kann. </h2>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Reverse-Charge,
+						Forderungsausfall, KSK, Rücklagen. Kontor rechnet <span class="brand-text">die Fälle</span>, die
+						andere Tools verstecken. </p>
 				</div>
 				<!-- feature row: KSK -->
 				<div class="mt-16 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
 					<div class="reveal order-2 lg:order-1">
-						<span class="eyebrow normal-case tracking-[.05em]">Künstlersozialkasse</span>
-						<h3 class="font-display text-[1.9rem] font-bold mt-4 leading-tight">Endlich mitgedacht.</h3>
-						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> KSK je Monat als drei Beträge
-							<strong style="color:var(--ink)">KV / RV / PV</strong> – in der Reihenfolge deines
-							Bescheids. Direkt im Monatsabschluss gepflegt und automatisch vom Vormonat geerbt: einmal
-							eintragen, gilt fort. Der Monatswert ist die Soll-Quelle für Rücklage und Jahres-KSK; die
-							tatsächliche Abbuchung liegt als <strong style="color:var(--ink)">Ist</strong> im
-							Zahlungs-Ledger. </p>
+						<h3 class="font-display text-[1.9rem] font-bold leading-tight">Künstlersozialkasse, endlich
+							mitgedacht.</h3>
+						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> KSK je Monat als drei Beträge
+							<span class="brand-text">KV / RV / PV</span>, in der Reihenfolge deines Bescheids.
+							Im Monatsabschluss gepflegt, automatisch vom Vormonat geerbt: einmal eintragen, gilt fort.
+							Der Monatswert ist die Soll-Quelle für Rücklage und Jahres-KSK, die echte Abbuchung liegt als
+							<span class="brand-text">Ist</span> im Zahlungs-Ledger. </p>
 					</div>
 					<!-- native rebuild · KSK-Werte-Inspektor -->
 					<div class="reveal pan-x d1 order-1 lg:order-2">
@@ -1747,65 +1725,53 @@
 						</div>
 					</div>
 					<div class="reveal d1">
-						<span class="eyebrow normal-case tracking-[.05em]">Umsatzsteuer-Voranmeldung</span>
-						<h3 class="font-display text-[1.9rem] font-bold mt-4 leading-tight">Zum Abtippen –
-							formular-getreu nach ELSTER.</h3>
-						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> Keine kryptischen Summen, sondern
-							exakt die Kennzahlen, die im Formular stehen – mit Klartext-Label und Erklärung je Zeile.
-							Voranmeldung wird Abschreiben. </p>
-						<div class="mt-5 flex flex-wrap gap-2">
-							<span class="pill num rounded-lg px-2.5 py-1 text-[.78rem]">KZ&nbsp;81/86 · Bemessung</span>
-							<span class="pill num rounded-lg px-2.5 py-1 text-[.78rem]">KZ&nbsp;66 · Vorsteuer</span>
-							<span class="pill num rounded-lg px-2.5 py-1 text-[.78rem]">KZ&nbsp;84/85 · §13b</span>
-							<span class="pill num rounded-lg px-2.5 py-1 text-[.78rem]">KZ&nbsp;67</span>
-							<span class="pill num rounded-lg px-2.5 py-1 text-[.78rem]">KZ&nbsp;83 · Zahllast</span>
-						</div>
+						<h3 class="font-display text-[1.9rem] font-bold leading-tight">UStVA, formular-getreu nach
+							ELSTER.</h3>
+						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> Keine kryptischen Summen, sondern
+							exakt die Kennzahlen aus dem Formular, mit Klartext-Label und Erklärung je Zeile. <span
+								class="brand-text">Voranmeldung wird Abschreiben.</span> </p>
 					</div>
 				</div>
 				<!-- three cards: §13b, Rücklagen, §17 -->
 				<div class="mt-20 grid md:grid-cols-3 gap-5">
 					<div class="reveal rounded-2xl p-7"
 						style="background:var(--surface-2);border:1px solid var(--hair)">
-						<span class="eyebrow normal-case tracking-[.06em]">§ 13b</span>
-						<h3 class="font-display text-[1.35rem] font-bold mt-3">Reverse-Charge, das stimmt</h3>
+						<h3 class="font-display text-[1.35rem] font-bold">Reverse-Charge nach §13b</h3>
 						<p class="mt-3 leading-relaxed text-[.97rem]" style="color:var(--muted)"> Auslands-Tools (Figma,
 							ChatGPT &amp; Co.) nach §13b: USt in KZ&nbsp;84/85, zugleich als Vorsteuer abziehbar →
-							<strong style="color:var(--ink-2)">cash-neutral</strong>. Der Netto-Betrag bleibt eine echte
+							<span class="brand-text">cash-neutral</span>. Der Netto-Betrag bleibt eine echte
 							Betriebsausgabe in der EÜR. </p>
 					</div>
 					<div class="reveal d1 rounded-2xl p-7"
 						style="background:var(--surface-2);border:1px solid var(--hair)">
-						<span class="eyebrow normal-case tracking-[.06em]">Rücklagen</span>
-						<h3 class="font-display text-[1.35rem] font-bold mt-3">Die du verstehst</h3>
+						<h3 class="font-display text-[1.35rem] font-bold">Rücklagen, die du verstehst</h3>
 						<p class="mt-3 leading-relaxed text-[.97rem]" style="color:var(--muted)"> ESt-Rücklage pauschal
-							<span class="num">(Gewinn − KSK) × Satz</span> – bewusst grob, eher konservativ. Der Satz
-							ist <strong style="color:var(--ink-2)">monatlich justierbar</strong> (z.&nbsp;B. ab Februar
+							<span class="num">(Gewinn − KSK) × Satz</span>, bewusst grob, eher konservativ. Der Satz
+							ist <span class="brand-text">monatlich justierbar</span> (z.&nbsp;B. ab Februar
 							15&nbsp;%), ohne abgeschlossene Monate anzufassen. </p>
 					</div>
 					<div class="reveal d2 rounded-2xl p-7"
 						style="background:var(--surface-2);border:1px solid var(--hair)">
-						<span class="eyebrow normal-case tracking-[.06em]">§ 17</span>
-						<h3 class="font-display text-[1.35rem] font-bold mt-3">Forderungsausfall</h3>
+						<h3 class="font-display text-[1.35rem] font-bold">Forderungsausfall nach §17</h3>
 						<p class="mt-3 leading-relaxed text-[.97rem]" style="color:var(--muted)"> Wird eine Rechnung
-							uneinbringlich, korrigiert Kontor die USt <strong style="color:var(--ink-2)">und</strong>
-							löst die ESt-Rücklage auf – im richtigen Monat. Abgeschlossene Perioden bleiben unberührt.
+							uneinbringlich, korrigiert Kontor die USt und
+							löst die ESt-Rücklage auf, im richtigen Monat. Abgeschlossene Perioden bleiben unberührt.
 						</p>
 					</div>
 				</div>
 				<!-- MCP / KI highlight -->
 				<div class="reveal mt-16 rounded-3xl overflow-hidden"
-					style="border:1px solid var(--hair);background:linear-gradient(140deg,color-mix(in srgb,var(--brand-blue) 12%,var(--surface)),color-mix(in srgb,var(--brand-2) 14%,var(--surface)))">
+					style="background:color-mix(in srgb,var(--brand) 8%,var(--surface))">
 					<div class="grid lg:grid-cols-2 gap-8 p-8 sm:p-12 items-center">
 						<div>
-							<span class="eyebrow normal-case tracking-[.05em]">Lokaler MCP-Server</span>
-							<h3 class="font-display text-[1.9rem] font-bold mt-4 leading-tight">Frag deine Buchhaltung.
+							<h3 class="font-display text-[1.9rem] font-bold leading-tight">Frag deine Buchhaltung.
 							</h3>
-							<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> Schalt den mitgelieferten
-								MCP-Server ein, verbinde Claude – und frag in normaler Sprache. Lesen über alle Module,
-								sparsames Schreiben inklusive. Alles nur lokal auf <span class="num">127.0.0.1</span>,
-								Token in der Keychain, automatisches Backup vor dem ersten Schreibzugriff. </p>
-							<p class="mt-4 font-medium" style="color:var(--ink)">Deine KI sieht deine Zahlen. Das
-								Internet nie.</p>
+							<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> Schalt den mitgelieferten
+								MCP-Server ein, verbinde Claude und frag in normaler Sprache. Lesen über alle Module,
+								sparsames Schreiben inklusive. Alles lokal auf <span class="num">127.0.0.1</span>, Token
+								in der Keychain, Backup vor dem ersten Schreibzugriff. </p>
+							<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug brand-text">Deine KI
+								sieht deine Zahlen. Das Internet nie.</p>
 						</div>
 						<!-- mock chat -->
 						<div class="ui-card ui-hover rounded-2xl p-5 sm:p-6">
@@ -1836,13 +1802,12 @@
 		<section id="anbord" class="py-24 sm:py-32" style="background:var(--bg-2)">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<span class="eyebrow">Alles an Bord</span>
 					<h2
-						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Kein Prototyp. Fertig. </h2>
-					<p class="mt-6 text-[1.12rem] leading-relaxed" style="color:var(--ink-2)"> Auswertungen in drei
-						Zeithorizonten, ein Ledger für alle Abflüsse, Banking-Import mit Triage, Belege mit OCR – und
-						ein sanfter Einstieg mit Demodaten. </p>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Drei Zeithorizonte, ein
+						Ledger für <span class="brand-text">alle Abflüsse</span>, Banking-Import mit Triage, Belege mit
+						OCR, sanfter Einstieg mit Demodaten. </p>
 				</div>
 				<!-- three horizons -->
 				<div class="mt-12 grid md:grid-cols-3 gap-5">
@@ -1856,7 +1821,7 @@
 						style="background:var(--surface);border:1px solid var(--hair)">
 						<h3 class="font-display text-[1.2rem] font-bold">UStVA</h3>
 						<p class="mt-2 text-[.95rem] leading-relaxed" style="color:var(--muted)">Pro Quartal oder Monat,
-							formular-getreu nach ELSTER – jede Kennzahl per Klick kopierbar.</p>
+							formular-getreu nach ELSTER, jede Kennzahl per Klick kopierbar.</p>
 					</div>
 					<div class="reveal d2 rounded-2xl p-6"
 						style="background:var(--surface);border:1px solid var(--hair)">
@@ -1983,14 +1948,13 @@
 						</div>
 					</div>
 					<div class="reveal d1 order-1 lg:order-2">
-						<span class="eyebrow normal-case tracking-[.05em]">Ausgaben</span>
-						<h3 class="font-display text-[1.7rem] font-bold mt-4 leading-tight">Ein Ledger für <em>alle</em>
+						<h3 class="font-display text-[1.7rem] font-bold leading-tight">Ein Ledger für <span class="brand-text">alle</span>
 							Abflüsse.</h3>
-						<p class="mt-4 leading-relaxed" style="color:var(--ink-2)"> Betriebsausgaben, Fixkosten,
-							Subscriptions sowie Vorsorge (KSK) und Steuern in einer Tabelle, gefiltert nach Art · Sparte
-							· Monat. Pro Posten brutto/VSt/netto, Steuerart, umlagefähig. Wiederkehrendes als datierte
-							Buchungen – Vorlagen per Klick oder „Vormonat duplizieren“. Privat und betrieblich sauber
-							getrennt. </p>
+						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> Betriebsausgaben, Fixkosten,
+							Subscriptions, Vorsorge (KSK) und Steuern in einer Tabelle, gefiltert nach Art, Sparte,
+							Monat. Pro Posten brutto/VSt/netto und Steuerart. Wiederkehrendes als datierte Buchungen, per
+							Klick oder „Vormonat duplizieren“. <span class="brand-text">Privat und betrieblich sauber
+							getrennt.</span> </p>
 					</div>
 				</div>
 				<!-- two-up gallery: Jahresabschluss + Privat -->
@@ -2000,7 +1964,7 @@
 						<div class="pan-x">
 							<div class="ui-card ui-hover overflow-hidden">
 								<div class="p-5 grid grid-cols-2 gap-4 text-white"
-									style="background:linear-gradient(125deg,#1aa45f,#15803d)">
+									style="background:#2463EB">
 									<div>
 										<div class="text-[.72rem]" style="opacity:.88">Gewinn (EÜR)</div>
 										<div class="num text-[1.45rem] font-semibold mt-1 leading-none">13.976,00 €
@@ -2074,27 +2038,27 @@
 								<div id="pv-chart" class="mt-5 flex items-end gap-1 h-24">
 									<div class="flex-1 flex flex-col justify-end h-full"><span
 											class="bar-grow rounded-t"
-											style="height:89%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+											style="height:89%;background:#2463EB"></span>
 									</div>
 									<div class="flex-1 flex flex-col justify-end h-full"><span
 											class="bar-grow rounded-t"
-											style="height:100%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+											style="height:100%;background:#2463EB"></span>
 									</div>
 									<div class="flex-1 flex flex-col justify-end h-full"><span
 											class="bar-grow rounded-t"
-											style="height:98%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+											style="height:98%;background:#2463EB"></span>
 									</div>
 									<div class="flex-1 flex flex-col justify-end h-full"><span
 											class="bar-grow rounded-t"
-											style="height:94%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+											style="height:94%;background:#2463EB"></span>
 									</div>
 									<div class="flex-1 flex flex-col justify-end h-full"><span
 											class="bar-grow rounded-t"
-											style="height:99%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+											style="height:99%;background:#2463EB"></span>
 									</div>
 									<div class="flex-1 flex flex-col justify-end h-full"><span
 											class="bar-grow rounded-t"
-											style="height:94%;background:linear-gradient(180deg,#fb7185,#f43f5e)"></span>
+											style="height:94%;background:#2463EB"></span>
 									</div>
 									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
 											style="height:8%;background:var(--bg-2)"></span></div>
@@ -2144,7 +2108,7 @@
 						</div>
 						<h3 class="font-display text-[1.3rem] font-bold mt-5">Privat, getrennt gehalten</h3>
 						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Privat-Übersicht,
-							Lebensmittel &amp; Anschaffungen mit optionalen Budgets – sauber vom Betrieblichen getrennt.
+							Lebensmittel &amp; Anschaffungen mit optionalen Budgets, sauber vom Betrieblichen getrennt.
 						</p>
 					</div>
 				</div>
@@ -2153,12 +2117,12 @@
 					<div class="reveal rounded-xl p-5" style="background:var(--surface);border:1px solid var(--hair)">
 						<h4 class="font-semibold">Sanfter Einstieg</h4>
 						<p class="mt-1.5 text-[.9rem] leading-relaxed" style="color:var(--muted)">Leer beginnen oder mit
-							Demodaten ausprobieren – risikofrei, jederzeit löschbar.</p>
+							Demodaten ausprobieren, risikofrei, jederzeit löschbar.</p>
 					</div>
 					<div class="reveal d1 rounded-xl p-5"
 						style="background:var(--surface);border:1px solid var(--hair)">
 						<h4 class="font-semibold">Beleg-Export (ZIP)</h4>
-						<p class="mt-1.5 text-[.9rem] leading-relaxed" style="color:var(--muted)">Pro Jahr – für
+						<p class="mt-1.5 text-[.9rem] leading-relaxed" style="color:var(--muted)">Pro Jahr, für
 							Steuerberater oder Betriebsprüfung.</p>
 					</div>
 					<div class="reveal d2 rounded-xl p-5"
@@ -2176,92 +2140,17 @@
 				</div>
 			</div>
 		</section>
-		<!-- ============ §6 DIE FEINHEITEN ============ -->
-		<section class="py-24 sm:py-32">
-			<div class="mx-auto max-w-7xl px-5 sm:px-8">
-				<div class="max-w-3xl reveal">
-					<span class="eyebrow">Die Feinheiten</span>
-					<h2
-						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
-						Hier hat jemand mit Liebe gebaut. </h2>
-				</div>
-				<div class="mt-12 grid md:grid-cols-2 gap-x-12 gap-y-px">
-					<!-- column items as list rows -->
-					<div class="reveal flex gap-4 py-5 hairline border-b">
-						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
-						<p class="leading-relaxed"><strong>Inspector statt Sheet.</strong> <span
-								style="color:var(--muted)">Bearbeiten in einem ruhigen Flyout neben der Tabelle, live
-								gebunden – kein Modal, das dich aus dem Kontext reißt.</span></p>
-					</div>
-					<div class="reveal flex gap-4 py-5 hairline border-b">
-						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
-						<p class="leading-relaxed"><strong>Ein Klick, fertig.</strong> <span
-								style="color:var(--muted)">„Duplizieren (heute)“, „bezahlt → heutiges Datum“, Inline-„+“
-								direkt in der Tabelle.</span></p>
-					</div>
-					<div class="reveal flex gap-4 py-5 hairline border-b">
-						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
-						<p class="leading-relaxed"><strong>Jede Zahl ist kopierbar.</strong> <span
-								style="color:var(--muted)">Klick auf einen Wert legt ihn in die Zwischenablage – fürs
-								ELSTER-Formular oder die Mail an den Berater.</span></p>
-					</div>
-					<div class="reveal flex gap-4 py-5 hairline border-b">
-						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
-						<p class="leading-relaxed"><strong>Soll und Ist sauber getrennt.</strong> <span
-								style="color:var(--muted)">KSK-Monatswert = Soll, die echte Abbuchung = Ist im
-								Zahlungs-Ledger. Keine stille Vermischung.</span></p>
-					</div>
-					<div class="reveal flex gap-4 py-5 hairline border-b">
-						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
-						<p class="leading-relaxed"><strong>Datierte Sätze.</strong> <span
-								style="color:var(--muted)">ESt-Satz ab Februar 15&nbsp;%? Ältere Monate bleiben, wie sie
-								waren; KSK-Werte erben einzeln vom Vormonat.</span></p>
-					</div>
-					<div class="reveal flex gap-4 py-5 hairline border-b">
-						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
-						<p class="leading-relaxed"><strong>USt-Vorauszahlung im Januar?</strong> <span
-								style="color:var(--muted)">Kontor weiß, dass die zum Vorjahr gehört (Fälligkeitsfenster,
-								mit/ohne Dauerfristverlängerung) – und ordnet sie richtig zu.</span></p>
-					</div>
-					<div class="reveal flex gap-4 py-5 hairline border-b">
-						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
-						<p class="leading-relaxed"><strong>Geteilter Zeitraum.</strong> <span
-								style="color:var(--muted)">Modulwechsel behält den gewählten Monat/das Jahr. Das
-								Dashboard zeigt trotzdem immer „heute“.</span></p>
-					</div>
-					<div class="reveal flex gap-4 py-5 hairline border-b">
-						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
-						<p class="leading-relaxed"><strong>Geld ist <span class="num">Decimal</span>, nie <span
-									class="num">Double</span>.</strong> <span style="color:var(--muted)">Cent-genau,
-								keine Rundungsgespenster. Klingt nach Detail, ist Vertrauen.</span></p>
-					</div>
-					<div class="reveal flex gap-4 py-5 hairline border-b">
-						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
-						<p class="leading-relaxed"><strong>Zurückhaltendes Design.</strong> <span
-								style="color:var(--muted)">Neutrale graue Icons, Farbe nur dort, wo sie etwas bedeutet –
-								in Summen und roten Negativwerten.</span></p>
-					</div>
-					<div class="reveal flex gap-4 py-5 hairline border-b">
-						<span class="num text-[.8rem] mt-1 shrink-0" style="color:var(--brand)">↳</span>
-						<p class="leading-relaxed"><strong>Geprüft, nicht gehofft.</strong> <span
-								style="color:var(--muted)">Die Engine läuft gegen nachrechenbare Demo-Werte –
-								Soll/Zufluss, §13b-Rundung, §17, Rücklagen. Stimmt, statt „sollte stimmen“.</span></p>
-					</div>
-				</div>
-			</div>
-		</section>
 		<!-- ============ §7 FÜR WEN ============ -->
 		<section class="py-24 sm:py-32" style="background:var(--bg-2)">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<span class="eyebrow">Für wen</span>
 					<h2
-						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Erkennst du dich wieder? </h2>
 				</div>
-				<p class="mt-6 max-w-3xl reveal text-[1.05rem] leading-relaxed" style="color:var(--muted)">Kontor ist
-					für <strong style="color:var(--ink-2)">KSK-versicherte Kreative mit Regelbesteuerung</strong> gebaut
-					– ob du mit 7&nbsp;%, 19&nbsp;% oder beidem fakturierst. Sechs typische Fälle:</p>
+				<p class="mt-6 max-w-3xl reveal font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)">Kontor ist
+					für <span class="brand-text">KSK-versicherte Kreative mit Regelbesteuerung</span> gebaut,
+					ob 7&nbsp;%, 19&nbsp;% oder beides. <span class="brand-text">Sechs typische Fälle:</span></p>
 				<div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
 					<!-- Persona · Designer -->
 					<div class="reveal rounded-2xl p-8"
@@ -2349,7 +2238,7 @@
 						</div>
 						<h3 class="font-display text-[1.4rem] font-bold mt-5">Illustratoren &amp; Fotografen</h3>
 						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Gelieferte Abzüge oder Produkte oft
-							19&nbsp;%, eingeräumte Bildrechte 7&nbsp;% – der klassische Mischfall.</p>
+							19&nbsp;%, eingeräumte Bildrechte 7&nbsp;%, der klassische Mischfall.</p>
 						<p class="mt-4 text-[.95rem] font-semibold" style="color:var(--brand)">→ Kontor rechnet beide
 							Anteile auf einem Beleg.</p>
 					</div>
@@ -2375,73 +2264,67 @@
 				</div>
 				<p class="mt-6 max-w-3xl reveal text-[.9rem] leading-relaxed" style="color:var(--muted)">Welcher Satz
 					konkret gilt, hängt vom Einzelfall ab (Schöpfungshöhe, Verwertungsart). Kontor rechnet mit dem Satz,
-					den du wählst – die steuerliche Einordnung bleibt bei dir bzw. deiner Steuerberatung.</p>
+					den du wählst. Die Einordnung bleibt bei dir oder deiner Steuerberatung.</p>
 				<div class="mt-12 grid lg:grid-cols-2 gap-5">
-					<div class="reveal rounded-2xl p-8" style="background:var(--surface);border:1px solid var(--hair)">
-						<h3 class="font-display text-[1.4rem] font-bold">Kontor ist für dich, wenn du …</h3>
-						<ul class="mt-5 space-y-3.5">
+					<div class="reveal rounded-2xl p-8" style="background:var(--surface)">
+						<h3 class="font-display text-[1.5rem] font-bold">Kontor ist für dich, wenn du …</h3>
+						<ul class="mt-6 space-y-4 text-[1.05rem]">
 							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
 									stroke-linecap="round" stroke-linejoin="round">
 									<path d="M20 6L9 17l-5-5" />
-								</svg><span style="color:var(--ink-2)">als <strong
-										style="color:var(--ink)">Kreativer</strong> regelbesteuert fakturierst – mit
-									7&nbsp;%, 19&nbsp;% oder beidem,</span></li>
+								</svg><span style="color:var(--ink-2)">als <span class="brand-text">Kreativer</span>
+									fakturierst, mit 7&nbsp;%, 19&nbsp;% oder beidem</span></li>
 							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
 									stroke-linecap="round" stroke-linejoin="round">
 									<path d="M20 6L9 17l-5-5" />
-								</svg><span style="color:var(--ink-2)">deine <strong
-										style="color:var(--ink)">EÜR</strong> selbst machst und quartalsweise <strong
-										style="color:var(--ink)">UStVA</strong> abgibst,</span></li>
+								</svg><span style="color:var(--ink-2)">deine <span class="brand-text">EÜR</span> selbst
+									machst und quartalsweise <span class="brand-text">UStVA</span> abgibst</span></li>
 							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
 									stroke-linecap="round" stroke-linejoin="round">
 									<path d="M20 6L9 17l-5-5" />
-								</svg><span style="color:var(--ink-2)"><strong
-										style="color:var(--ink)">KSK-versichert</strong> bist oder es bald wirst,</span>
-							</li>
+								</svg><span style="color:var(--ink-2)"><span class="brand-text">KSK-versichert</span> bist
+									oder es bald wirst</span></li>
 							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
 									stroke-linecap="round" stroke-linejoin="round">
 									<path d="M20 6L9 17l-5-5" />
-								</svg><span style="color:var(--ink-2)">deine Zahlen lieber <strong
-										style="color:var(--ink)">auf dem eigenen Gerät</strong> hast als in der
-									Cloud,</span></li>
+								</svg><span style="color:var(--ink-2)">deine Zahlen lieber <span
+										class="brand-text">lokal</span> hast als in der Cloud</span></li>
 							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
 									stroke-linecap="round" stroke-linejoin="round">
 									<path d="M20 6L9 17l-5-5" />
-								</svg><span style="color:var(--ink-2)">eine App willst, die <em>deinen</em> Fall kann –
-									nicht 90&nbsp;% von jedermanns Fall.</span></li>
+								</svg><span style="color:var(--ink-2)">eine App willst, die <span
+										class="brand-text">deinen</span> Fall kann</span></li>
 						</ul>
 					</div>
 					<div class="reveal d1 rounded-2xl p-8"
-						style="background:color-mix(in srgb,var(--surface) 50%,transparent);border:1px dashed var(--hair)">
-						<h3 class="font-display text-[1.4rem] font-bold" style="color:var(--muted)">(Noch) nicht für
+						style="background:color-mix(in srgb,var(--surface) 50%,transparent)">
+						<h3 class="font-display text-[1.5rem] font-bold" style="color:var(--muted)">(Noch) nicht für
 							dich, wenn du …</h3>
-						<ul class="mt-5 space-y-3.5">
+						<ul class="mt-6 space-y-4 text-[1.05rem]">
 							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--muted)"
 									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
 									stroke-linecap="round" stroke-linejoin="round">
 									<path d="M18 6L6 18M6 6l12 12" />
-								</svg><span style="color:var(--muted)"><strong>Ist-Versteuerung</strong> oder
-									Kleinunternehmer (§19) brauchst,</span></li>
+								</svg><span style="color:var(--muted)">Ist-Versteuerung oder Kleinunternehmer (§19)
+									brauchst</span></li>
 							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--muted)"
 									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
 									stroke-linecap="round" stroke-linejoin="round">
 									<path d="M18 6L6 18M6 6l12 12" />
-								</svg><span style="color:var(--muted)">überwiegend <strong>steuerfreie Umsätze</strong>
-									hast (z.&nbsp;B. viele §&nbsp;4-Auftritte),</span></li>
+								</svg><span style="color:var(--muted)">überwiegend steuerfreie Umsätze hast</span></li>
 							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--muted)"
 									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
 									stroke-linecap="round" stroke-linejoin="round">
 									<path d="M18 6L6 18M6 6l12 12" />
-								</svg><span style="color:var(--muted)">eine <strong>GmbH</strong> mit doppelter
-									Buchführung, Lohnabrechnung und Multi-User-Teams führst.</span></li>
+								</svg><span style="color:var(--muted)">eine GmbH mit Buchführung, Lohn und Team
+									führst</span></li>
 						</ul>
-						<p class="mt-6 text-[.9rem]" style="color:var(--muted)">Wer sich hier wiedererkennt, ist nicht
-							die Zielgruppe – auch gut.</p>
+						<p class="mt-6 text-[.95rem]" style="color:var(--muted)">Nicht deine Baustelle? Auch gut.</p>
 					</div>
 				</div>
 			</div>
@@ -2450,13 +2333,12 @@
 		<section id="galerie" class="py-24 sm:py-32">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<span class="eyebrow">Sieh selbst</span>
 					<h2
-						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Echte Aufnahmen aus Kontor. </h2>
-					<p class="mt-6 text-[1.12rem] leading-relaxed" style="color:var(--ink-2)"> Kein Mockup-Zauber – das
-						ist die App. Wisch dich seitlich durch<span class="hidden md:inline"> und klick zum
-							Vergrößern</span>. </p>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Kein Mockup-Zauber,
+						<span class="brand-text">das ist die App</span>. Wisch dich seitlich durch<span
+							class="hidden md:inline"> und klick zum Vergrößern</span>. </p>
 				</div>
 			</div>
 			<div class="gal-scroll mt-12 flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory px-5 sm:px-8 py-2">
@@ -2561,10 +2443,11 @@
 		<section class="py-24 sm:py-32">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<span class="eyebrow">Technik &amp; Vertrauen</span>
 					<h2
-						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Prüf den Code, nicht nur das Versprechen. </h2>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Local-first, quelloffen,
+						getestet. <span class="brand-text">Vertrauen, das man nachlesen kann.</span> </p>
 				</div>
 				<div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
 					<div class="reveal rounded-2xl p-7"
@@ -2583,11 +2466,11 @@
 						style="background:var(--surface-2);border:1px solid var(--hair)">
 						<h3 class="font-display text-[1.2rem] font-bold">Korrektheit ist getestet</h3>
 						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Die Steuerlogik steckt
-							in reinen, geprüften Bausteinen – verifiziert gegen nachrechenbare Demo-Werte.</p>
+							in reinen, geprüften Bausteinen, verifiziert gegen nachrechenbare Demo-Werte.</p>
 					</div>
 					<div class="reveal rounded-2xl p-7"
 						style="background:var(--surface-2);border:1px solid var(--hair)">
-						<h3 class="font-display text-[1.2rem] font-bold">KI-Zugriff – auch lokal</h3>
+						<h3 class="font-display text-[1.2rem] font-bold">KI-Zugriff, auch lokal</h3>
 						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Der MCP-Server lauscht
 							nur auf <span class="num">127.0.0.1</span>, ist Token-geschützt (Keychain) und sichert vor
 							dem ersten Schreibzugriff.</p>
@@ -2596,13 +2479,13 @@
 						style="background:var(--surface-2);border:1px solid var(--hair)">
 						<h3 class="font-display text-[1.2rem] font-bold">Quelltext offen</h3>
 						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Source-available auf
-							GitHub (PolyForm Perimeter) – prüf den Code, vertrau nicht nur dem Versprechen.</p>
+							GitHub (PolyForm Perimeter). Prüf den Code, vertrau nicht nur dem Versprechen.</p>
 					</div>
 					<div class="reveal d2 rounded-2xl p-7"
 						style="background:var(--surface-2);border:1px solid var(--hair)">
 						<h3 class="font-display text-[1.2rem] font-bold">Kein Abo</h3>
 						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Kostenlos &amp;
-							quelloffen statt Abo-Falle. Lade sie, fertig – sie gehört dir.</p>
+							quelloffen statt Abo-Falle. Lade sie, fertig, sie gehört dir.</p>
 					</div>
 				</div>
 			</div>
@@ -2611,9 +2494,8 @@
 		<section id="preis" hidden class="py-24 sm:py-32" style="background:var(--bg-2)">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<span class="eyebrow">Preis</span>
 					<h2
-						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Kaufen oder selbst bauen. Kein Abo, keine Tricks. </h2>
 				</div>
 				<div class="mt-12 grid lg:grid-cols-2 gap-5 items-stretch">
@@ -2621,11 +2503,11 @@
 					<div class="reveal relative rounded-3xl p-8 sm:p-10 overflow-hidden"
 						style="background:var(--surface);border:1px solid color-mix(in srgb,var(--brand) 40%,var(--hair));box-shadow:var(--shadow)">
 						<div class="absolute inset-x-0 top-0 h-1"
-							style="background:linear-gradient(90deg,var(--brand-blue),var(--brand-2))"></div>
+							style="background:#2463EB"></div>
 						<div class="flex items-center justify-between">
-							<span class="eyebrow normal-case tracking-[.05em]">Einmalkauf</span>
-							<span class="pill rounded-full px-3 py-1 text-[.74rem]"
-								style="color:var(--brand)">Empfohlen</span>
+							<span class="font-semibold text-[.95rem]">Einmalkauf</span>
+							<span class="rounded-full px-3 py-1 text-[.74rem] font-semibold"
+								style="color:var(--brand);background:color-mix(in srgb,var(--brand) 12%,transparent)">Empfohlen</span>
 						</div>
 						<div class="mt-6 flex items-end gap-2">
 							<span class="num font-display text-[3.5rem] leading-none font-medium">19,99&nbsp;€</span>
@@ -2657,7 +2539,7 @@
 					<!-- Fork -->
 					<div class="reveal d1 rounded-3xl p-8 sm:p-10"
 						style="background:color-mix(in srgb,var(--surface) 45%,transparent);border:1px dashed var(--hair)">
-						<span class="eyebrow normal-case tracking-[.05em]">Selbst bauen · spendenbasiert</span>
+						<span class="font-semibold text-[.95rem]">Selbst bauen · spendenbasiert</span>
 						<div class="mt-6 font-display text-[3rem] leading-none font-bold">Dein Fork</div>
 						<p class="mt-2" style="color:var(--muted)">für Advanced User</p>
 						<p class="mt-5 leading-relaxed" style="color:var(--ink-2)">Der Quelltext ist offen. Bau dir mit
@@ -2667,7 +2549,7 @@
 							<li class="flex gap-2.5"><span class="num shrink-0" style="color:var(--brand)">↳</span><span
 									style="color:var(--ink-2)">Forken, anpassen, selbst bauen – frei</span></li>
 							<li class="flex gap-2.5"><span class="num shrink-0" style="color:var(--brand)">↳</span><span
-									style="color:var(--ink-2)">Nur für <strong style="color:var(--ink)">dich</strong>,
+									style="color:var(--ink-2)">Nur für <span class="brand-text">dich</span>,
 									kein Weiterverkauf</span></li>
 							<li class="flex gap-2.5"><span class="num shrink-0" style="color:var(--brand)">↳</span><span
 									style="color:var(--ink-2)">Hilft dir Kontor? Ich freue mich über eine Spende
@@ -2694,10 +2576,9 @@
 		<section id="faq" class="py-24 sm:py-32">
 			<div class="mx-auto max-w-3xl px-5 sm:px-8">
 				<div class="reveal text-center">
-					<span class="eyebrow justify-center">Häufige Fragen</span>
 					<h2
-						class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
-						Ehrliche Antworten. </h2>
+						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Häufige Fragen, ehrlich beantwortet. </h2>
 				</div>
 				<div class="reveal mt-12">
 					<details class="faq py-5">
@@ -2765,9 +2646,7 @@
 		<!-- ============ §11 SCHLUSS-CTA ============ -->
 		<section id="download" class="px-5 sm:px-8 pb-24 sm:pb-32">
 			<div class="reveal relative mx-auto max-w-7xl rounded-[2rem] overflow-hidden text-center px-6 py-20 sm:py-28"
-				style="background:linear-gradient(135deg,var(--brand-blue),var(--brand-2))">
-				<div class="absolute inset-0 opacity-30"
-					style="background:radial-gradient(60% 80% at 50% 0%,rgba(255,255,255,.45),transparent)"></div>
+				style="background:#2463EB">
 				<div class="relative">
 					<h2
 						class="font-display font-extrabold text-white text-[clamp(2.2rem,5vw,4rem)] leading-[1.04] text-balance">
@@ -2817,14 +2696,12 @@ brew install --cask --no-quarantine kontor</code></pre>
 				<div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 					<!-- links: Text -->
 					<div class="reveal max-w-xl">
-						<span class="eyebrow">Spenden</span>
 						<h2
-							class="font-display font-bold mt-5 text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
-							Freiwillig – mehr ist es nicht. </h2>
-						<p class="mt-5 leading-relaxed text-[1.06rem]" style="color:var(--ink-2)">Du kannst mir hier
-							einen freiwilligen Betrag schenken, wenn dir danach ist – eine rein private Zuwendung,
-							<strong style="color:var(--ink)">ohne Gegenleistung, ohne Bedingung, ohne Vorteile</strong>.
-							Du kaufst nichts und bekommst nichts dafür.</p>
+							class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+							Freiwillig, mehr ist es nicht. </h2>
+						<p class="mt-5 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)">Du kannst mir einen
+							freiwilligen Betrag schenken, wenn dir danach ist. Eine private Zuwendung, <span class="brand-text">ohne Gegenleistung, ohne Bedingung, ohne Vorteile</span>. Du
+							kaufst nichts und bekommst nichts dafür.</p>
 						<p class="mt-4 text-[.92rem]" style="color:var(--muted)">Ob einmalig oder monatlich – ganz wie
 							du magst. Es verpflichtet zu nichts und ändert nichts: alles bleibt frei und offen für alle,
 							auch ohne Spende.</p>
@@ -2833,8 +2710,8 @@ brew install --cask --no-quarantine kontor</code></pre>
 					<div class="reveal d1 relative rounded-3xl p-8 sm:p-10 overflow-hidden"
 						style="background:var(--surface);border:1px solid color-mix(in srgb,var(--brand) 40%,var(--hair));box-shadow:var(--shadow)">
 						<div class="absolute inset-x-0 top-0 h-1"
-							style="background:linear-gradient(90deg,var(--brand-blue),var(--brand-2))"></div>
-						<span class="eyebrow normal-case tracking-[.05em]">Zwei Wege</span>
+							style="background:#2463EB"></div>
+						<span class="font-semibold text-[.95rem]">Zwei Wege</span>
 						<a data-donate href="#spenden"
 							class="btn-primary mt-5 inline-flex items-center justify-center gap-2 rounded-full px-6 h-[3.25rem] w-full text-[1rem] font-semibold">
 							<svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -3119,9 +2996,9 @@ brew install --cask --no-quarantine kontor</code></pre>
 				}
 			}
 			renderBars(document.getElementById('hw-chart'), profit,
-				{ scaleMax: 3700, gradient: 'linear-gradient(180deg,#3ddc84,#1aa45f)', animate: 'hw-bar', stub: 6 });
+				{ scaleMax: 3700, gradient: '#2463EB', animate: 'hw-bar', stub: 6 });
 			renderBars(document.getElementById('pv-chart'), expense,
-				{ scaleMax: 1500, gradient: 'linear-gradient(180deg,#fb7185,#f43f5e)', animate: 'bar-grow', stub: 8 });
+				{ scaleMax: 1500, gradient: '#2463EB', animate: 'bar-grow', stub: 8 });
 
 			// emphasise the current month in the hero label row
 			var labels = document.getElementById('hw-labels');
