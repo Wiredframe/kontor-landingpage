@@ -329,22 +329,61 @@
 			transform-origin: center bottom;
 			/* squash/Hüpfer vom Boden aus, Drehung um die eigene Hochachse */
 			will-change: transform;
-			filter: drop-shadow(0 14px 26px rgba(46, 61, 173, .34));
+			filter: drop-shadow(0 14px 26px color-mix(in srgb, #2463EB 55%, transparent));
 			/* folgt der runden Plate (Alpha), kein eckiger Schatten */
 		}
 
 		@media (prefers-reduced-motion: no-preference) {
 			@keyframes coin-hop {
-				0%   { transform: translateY(0)    scaleX(1)    scaleY(1)    rotateY(0deg); }
-				9%   { transform: translateY(0)    scaleX(1.09) scaleY(.82)  rotateY(0deg); }   /* Anlauf: kurz anducken */
-				15%  { transform: translateY(0)    scaleX(1.05) scaleY(.9)   rotateY(12deg); }  /* abdrücken */
-				34%  { transform: translateY(-40%) scaleX(.95)  scaleY(1.07) rotateY(160deg); } /* hoch + strecken + Drehung startet */
-				50%  { transform: translateY(-46%) scaleX(.98)  scaleY(1.03) rotateY(288deg); } /* Höhepunkt, Münze rotiert */
-				66%  { transform: translateY(0)    scaleX(1.08) scaleY(.88)  rotateY(360deg); } /* Landung: stauchen, Dreh fertig */
-				78%  { transform: translateY(-11%) scaleX(.98)  scaleY(1.03) rotateY(360deg); } /* Feder: kleiner Nachhüpfer */
-				88%  { transform: translateY(0)    scaleX(1.04) scaleY(.97)  rotateY(360deg); } /* aufsetzen */
-				95%  { transform: translateY(-3%)  scaleX(.99)  scaleY(1.01) rotateY(360deg); } /* ausschwingen */
-				100% { transform: translateY(0)    scaleX(1)    scaleY(1)    rotateY(360deg); } /* Ruhe (360°=0°) */
+				0% {
+					transform: translateY(0) scaleX(1) scaleY(1) rotateY(0deg);
+				}
+
+				9% {
+					transform: translateY(0) scaleX(1.09) scaleY(.82) rotateY(0deg);
+				}
+
+				/* Anlauf: kurz anducken */
+				15% {
+					transform: translateY(0) scaleX(1.05) scaleY(.9) rotateY(12deg);
+				}
+
+				/* abdrücken */
+				34% {
+					transform: translateY(-40%) scaleX(.95) scaleY(1.07) rotateY(160deg);
+				}
+
+				/* hoch + strecken + Drehung startet */
+				50% {
+					transform: translateY(-46%) scaleX(.98) scaleY(1.03) rotateY(288deg);
+				}
+
+				/* Höhepunkt, Münze rotiert */
+				66% {
+					transform: translateY(0) scaleX(1.08) scaleY(.88) rotateY(360deg);
+				}
+
+				/* Landung: stauchen, Dreh fertig */
+				78% {
+					transform: translateY(-11%) scaleX(.98) scaleY(1.03) rotateY(360deg);
+				}
+
+				/* Feder: kleiner Nachhüpfer */
+				88% {
+					transform: translateY(0) scaleX(1.04) scaleY(.97) rotateY(360deg);
+				}
+
+				/* aufsetzen */
+				95% {
+					transform: translateY(-3%) scaleX(.99) scaleY(1.01) rotateY(360deg);
+				}
+
+				/* ausschwingen */
+				100% {
+					transform: translateY(0) scaleX(1) scaleY(1) rotateY(360deg);
+				}
+
+				/* Ruhe (360°=0°) */
 			}
 
 			.hero-appicon.is-hopping {
@@ -771,6 +810,32 @@
 			text-decoration: underline;
 			text-underline-offset: 2px;
 		}
+	
+		/* Hero-Wort-Rotator: Slide von unten nach oben + Fade. Laeuft einmal, bleibt auf dem ersten Begriff. */
+		.rotator { position:relative; display:block; height:1.32em; overflow:hidden; }
+		.rot-word {
+			position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+			line-height:1; white-space:nowrap; color:var(--brand); opacity:0; will-change:transform, opacity;
+		}
+		.rot-word:first-child { opacity:1; }
+		@media (prefers-reduced-motion: no-preference) {
+			.rotator.play .rot-word { animation:rot-cycle 2.9s cubic-bezier(.5, 0, .2, 1) both; }
+			.rotator.play .rot-word:nth-child(2) { animation-delay:2.4s; }
+			.rotator.play .rot-word:nth-child(3) { animation-delay:4.8s; }
+			.rotator.play .rot-word:nth-child(4) { animation-delay:7.2s; }
+			.rotator.play .rot-word:nth-child(5) { animation:rot-final 2.9s cubic-bezier(.5, 0, .2, 1) 9.6s both; }
+		}
+		@keyframes rot-cycle {
+			0%   { transform:translateY(90%);  opacity:0; }
+			17%  { transform:translateY(0);    opacity:1; }
+			83%  { transform:translateY(0);    opacity:1; }
+			100% { transform:translateY(-90%); opacity:0; }
+		}
+		@keyframes rot-final {
+			0%   { transform:translateY(90%); opacity:0; }
+			17%  { transform:translateY(0);   opacity:1; }
+			100% { transform:translateY(0);   opacity:1; }
+		}
 	</style>
 	<link rel="stylesheet" href="assets/tailwind.css" />
 </head>
@@ -787,7 +852,7 @@
 				<span class="font-display text-[1.35rem] font-bold tracking-tight">Kontor</span>
 			</a>
 			<nav class="hidden lg:flex items-center gap-8 text-[.92rem]" style="color:var(--ink-2)">
-				<a href="#frei" class="hover:opacity-70">Frei verfügbar</a>
+				<a href="#frei" class="hover:opacity-70">Was dir bleibt</a>
 				<a href="#alltag" class="hover:opacity-70">Belege &amp; Import</a>
 				<a href="#besonders" class="hover:opacity-70">Sonderfälle</a>
 				<a href="#anbord" class="hover:opacity-70">Alles an Bord</a>
@@ -832,9 +897,19 @@
 						class="hero-appicon w-28 h-28 sm:w-32 sm:h-32" />
 				</div>
 				<h1
-					class="font-display font-extrabold mt-6 mx-auto max-w-[16ch] text-[clamp(2.5rem,6.2vw,4.75rem)] leading-[1.02] text-balance">
-					Rechnet wie dein Steuerberater. Schweigt wie ein <span class="brand-text">Tresor</span>. </h1>
-				<p class="mt-6 mx-auto max-w-[42ch] font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Native Mac-Buchhaltung für <span class="brand-text">KSK-versicherte Kreative</span>. EÜR, UStVA, KSK und Rücklagen, steuerlich korrekt und lokal auf deinem Mac. </p>
+					class="font-display font-extrabold mt-6 mx-auto leading-[1.02]"
+					style="font-size:clamp(2.2rem,6vw,4.75rem)">
+					<span class="rotator">
+						<span class="rot-word">Dein Geld</span>
+						<span class="rot-word">Deine Steuern</span>
+						<span class="rot-word">Deine Rücklagen</span>
+						<span class="rot-word">Deine KSK-Beiträge</span>
+						<span class="rot-word" aria-hidden="true">Dein Geld</span>
+					</span>
+					immer im Blick </h1>
+				<p class="mt-6 mx-auto font-display text-[1.25rem] font-semibold leading-snug text-balance"
+					style="color:var(--muted);max-width:46ch"> Einnahmen und Ausgaben erfasst, <span class="brand-text">Steuerrücklage
+						und KSK</span> automatisch mitgerechnet. Lokal auf deinem Mac. </p>
 				<div class="mt-9 flex flex-wrap items-center justify-center gap-3">
 					<a href="https://apps.apple.com/app/kontor-buchhaltung/id6788498504" target="_blank" rel="noopener"
 						class="btn-primary inline-flex items-center gap-2.5 rounded-full px-6 h-[3.25rem] text-[1rem] font-semibold">
@@ -842,8 +917,7 @@
 							aria-hidden="true">
 							<path
 								d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
-						</svg>
-						Kostenlos im Mac App Store </a>
+						</svg> Kostenlos im Mac App Store </a>
 					<a href="#frei"
 						class="btn-ghost inline-flex items-center gap-2 rounded-full px-6 h-[3.25rem] text-[1rem] font-medium">
 						Funktionen ansehen <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -1098,13 +1172,13 @@
 		<section id="frei" class="py-24 sm:py-32" style="background:var(--bg-2)">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<h2
-						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
-						Auf dem Konto liegen 6.000 €. Wie viel davon gehört wirklich <span
-							class="brand-text">dir</span>? </h2>
-					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Kontor rechnet es dir
-						vor: als Wasserfall vom Brutto bis zu <span class="brand-text">der einen Zahl, die zählt</span>.
-						Kein Bauchgefühl, keine böse Überraschung zum Quartalsende. </p>
+					<h2 class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance"> Auf
+						dem Konto liegen 6.000 €. Wie viel davon gehört wirklich <span class="brand-text">dir</span>?
+					</h2>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance"
+						style="color:var(--muted)"> Kontor rechnet es dir vor: als Wasserfall vom Brutto bis zu <span
+							class="brand-text">der einen Zahl, die zählt</span>. Kein Bauchgefühl, keine böse
+						Überraschung zum Quartalsende. </p>
 				</div>
 				<div class="mt-14 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
 					<!-- the waterfall -->
@@ -1216,25 +1290,29 @@
 		<section id="alltag" class="py-24 sm:py-32">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<h2
-						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+					<h2 class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Belege rein. Kontoauszug rein. <span class="brand-text">Fertig.</span>
 					</h2>
-					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Der mühsamste Teil der
-						Buchhaltung ist die Dateneingabe. In Kontor sind es <span class="brand-text">zwei Handgriffe im
-						Monat</span>, den Rest erledigen OCR und CSV-Import. Für Einnahmen wie Ausgaben. </p>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance"
+						style="color:var(--muted)"> Der mühsamste Teil der Buchhaltung ist die Dateneingabe. In Kontor
+						sind es <span class="brand-text">zwei Handgriffe im Monat</span>, den Rest erledigen OCR und
+						CSV-Import. Für Einnahmen wie Ausgaben. </p>
 				</div>
 				<!-- Handgriff 1 · Belege + OCR -->
 				<div class="mt-16 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
 					<div class="reveal">
 						<div class="flex items-center gap-3">
-							<span class="num grid place-items-center w-8 h-8 rounded-full text-[.9rem] font-bold shrink-0"
+							<span
+								class="num grid place-items-center w-8 h-8 rounded-full text-[.9rem] font-bold shrink-0"
 								style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">1</span>
-							<h3 class="font-display text-[1.9rem] font-bold leading-tight">Belege reinziehen, erfasst.</h3>
+							<h3 class="font-display text-[1.9rem] font-bold leading-tight">Belege reinziehen, erfasst.
+							</h3>
 						</div>
-						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> Zieh beliebig viele PDFs oder Fotos
-							auf einmal hinein, egal ob Eingang oder Ausgang. Apple Vision liest <span class="brand-text">Datum, Betrag und Anbieter</span>, hängt jeden Beleg an den
-							passenden Eintrag und legt fehlende an. Kein Abtippen, kein Sortieren. </p>
+						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug"
+							style="color:var(--muted)"> Zieh beliebig viele PDFs oder Fotos auf einmal hinein, egal ob
+							Eingang oder Ausgang. Apple Vision liest <span class="brand-text">Datum, Betrag und
+								Anbieter</span>, hängt jeden Beleg an den passenden Eintrag und legt fehlende an. Kein
+							Abtippen, kein Sortieren. </p>
 					</div>
 					<!-- OCR mock -->
 					<div class="reveal d1">
@@ -1448,136 +1526,42 @@
 					</div>
 					<div class="reveal d1 order-1 lg:order-2">
 						<div class="flex items-center gap-3">
-							<span class="num grid place-items-center w-8 h-8 rounded-full text-[.9rem] font-bold shrink-0"
+							<span
+								class="num grid place-items-center w-8 h-8 rounded-full text-[.9rem] font-bold shrink-0"
 								style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">2</span>
-							<h3 class="font-display text-[1.9rem] font-bold leading-tight">Kontoauszug einmal im Monat.</h3>
+							<h3 class="font-display text-[1.9rem] font-bold leading-tight">Kontoauszug einmal im Monat.
+							</h3>
 						</div>
-						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> Lade den CSV-Export (CAMT) deiner
-							Sparkasse hoch. Kontor ordnet jede Buchung zu und lernt deine Händler und Gläubiger.
-							Bekanntes erkennt es wieder und aktualisiert nur <span class="brand-text">Status und Zahldatum</span>. Nichts doppelt, nichts von Hand. </p>
+						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug"
+							style="color:var(--muted)"> Lade den CSV-Export (CAMT) deiner Sparkasse hoch. Kontor ordnet
+							jede Buchung zu und lernt deine Händler und Gläubiger. Bekanntes erkennt es wieder und
+							aktualisiert nur <span class="brand-text">Status und Zahldatum</span>. Nichts doppelt,
+							nichts von Hand. </p>
 					</div>
 				</div>
 			</div>
 		</section>
-		<!-- ============ §1 PROBLEM ============ -->
-		<section id="problem" class="py-24 sm:py-32">
+		<!-- ============ FUNKTIONEN · Sonderfälle + Alles an Bord ============ -->
+		<section id="besonders" class="py-24 sm:py-32" style="background:var(--bg-2)">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<h2
-						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
-						Dieselbe Rechnung, zwei Wahrheiten. </h2>
-					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Tabellen am Quartalsende.
-						Steuer-Tools, die alles können, nur nicht <span class="brand-text">deinen</span> Fall. Cloud-Dienste, die deine Umsätze
-						auf fremden Servern parken. Freiberuflich, KSK-versichert, EÜR selbst, quartalsweise UStVA?
-						<span class="brand-text">Dann kennst du das:</span> </p>
-				</div>
-				<div class="mt-12 grid md:grid-cols-3 gap-5">
-					<div class="reveal rounded-2xl p-7" style="background:var(--surface);border:1px solid var(--hair)">
-						<div class="num text-[.8rem]" style="color:var(--brand)">01</div>
-						<p class="mt-3 leading-relaxed" style="color:var(--ink-2)"> Die USt richtet sich nach dem
-							<span class="brand-text">Rechnungsdatum</span>, dein Gewinn nach dem <span class="brand-text">Zahlungseingang</span>, dieselbe Rechnung, zwei Wahrheiten.
-							Kein Tool denkt das mit. </p>
-					</div>
-					<div class="reveal d1 rounded-2xl p-7"
-						style="background:var(--surface);border:1px solid var(--hair)">
-						<div class="num text-[.8rem]" style="color:var(--brand)">02</div>
-						<p class="mt-3 leading-relaxed" style="color:var(--ink-2)">
-							<span class="brand-text">Reverse-Charge</span>, <span class="brand-text">Forderungsausfall</span>, <span class="brand-text">KSK-Beitrag</span>, <span class="brand-text">ESt-Rücklage</span>. Sonderfälle, die Standard-Software
-							ignoriert oder hinter 200 Buchungskonten versteckt.
-						</p>
-					</div>
-					<div class="reveal d2 rounded-2xl p-7"
-						style="background:var(--surface);border:1px solid var(--hair)">
-						<div class="num text-[.8rem]" style="color:var(--brand)">03</div>
-						<p class="mt-3 leading-relaxed" style="color:var(--ink-2)"> Und am Ende tippst du die Zahlen
-							doch wieder von Hand ins <span class="brand-text">ELSTER-Formular</span>. </p>
-					</div>
-				</div>
-				<p
-					class="reveal mt-12 font-display text-[clamp(1.4rem,2.6vw,2rem)] font-semibold leading-snug max-w-3xl text-balance">
-					Kontor ist für den einen Menschen gebaut, den die großen Tools vergessen: <span
-						class="brand-text">dich</span>. </p>
-			</div>
-		</section>
-		<!-- ============ §2 DREI VERSPRECHEN ============ -->
-		<section class="py-12 sm:py-16">
-			<div class="mx-auto max-w-7xl px-5 sm:px-8">
-				<div class="grid md:grid-cols-3 gap-5">
-					<!-- card 1 -->
-					<div class="reveal rounded-2xl p-8"
-						style="background:var(--surface-2);border:1px solid var(--hair)">
-						<div class="grid place-items-center w-12 h-12 rounded-xl"
-							style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">
-							<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-								stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-								<rect x="4" y="2" width="16" height="20" rx="2" />
-								<path d="M8 6h8M8 10h2M8 14h2M8 18h2M14 10h2v8h-2z" />
-							</svg>
-						</div>
-						<h3 class="font-display text-[1.5rem] font-bold mt-5">Rechnet steuerlich richtig</h3>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)"> Nicht „auch Buchhaltung“, sondern
-							<span class="brand-text">deine</span>: Soll-Versteuerung, Zuflussprinzip, §13b,
-							§17, KSK, pauschale ESt-Rücklage. Die Logik steckt in einer getesteten Engine, Schritt für
-							Schritt gegen nachrechenbare Werte geprüft. </p>
-					</div>
-					<!-- card 2 -->
-					<div class="reveal d1 rounded-2xl p-8"
-						style="background:var(--surface-2);border:1px solid var(--hair)">
-						<div class="grid place-items-center w-12 h-12 rounded-xl"
-							style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">
-							<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-								stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-								<rect x="4" y="11" width="16" height="10" rx="2" />
-								<path d="M8 11V7a4 4 0 0 1 8 0v4" />
-							</svg>
-						</div>
-						<h3 class="font-display text-[1.5rem] font-bold mt-5">Bleibt bei dir</h3>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)">
-							<span class="brand-text">Local-first, offline, Sandbox an.</span> Deine Umsätze
-							verlassen den Mac nicht. Kein Konto, kein Login, kein Tracking. Backup liegt als Datei in
-							deinem Ordner, nicht in fremder Hand.
-						</p>
-					</div>
-					<!-- card 3 -->
-					<div class="reveal d2 rounded-2xl p-8"
-						style="background:var(--surface-2);border:1px solid var(--hair)">
-						<div class="grid place-items-center w-12 h-12 rounded-xl"
-							style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">
-							<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-								stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15l-1.9-4.1L5.5 9l4.6-1.4z" />
-								<path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
-							</svg>
-						</div>
-						<h3 class="font-display text-[1.5rem] font-bold mt-5">Fühlt sich leicht an</h3>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)"> Native macOS-App in SwiftUI.
-							Schnell, ruhig, aufgeräumt. Inline bearbeiten, ein Klick zum Duplizieren, ein Klick zum
-							Abschluss. Buchhaltung, die sich nicht wie Strafe anfühlt. </p>
-					</div>
-				</div>
-			</div>
-		</section>
-		<!-- ============ §4 WAS KONTOR BESONDERS MACHT ============ -->
-		<section id="besonders" class="py-24 sm:py-32">
-			<div class="mx-auto max-w-7xl px-5 sm:px-8">
-				<div class="max-w-3xl reveal">
-					<h2
-						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
-						Die Sonderfälle, die sonst niemand kann. </h2>
-					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Reverse-Charge,
-						Forderungsausfall, KSK, Rücklagen. Kontor rechnet <span class="brand-text">die Fälle</span>, die
-						andere Tools verstecken. </p>
+					<h2 class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+						Die Fälle, die andere Tools <span class="brand-text">ignorieren</span>. </h2>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance"
+						style="color:var(--muted)"> KSK, Umsatzsteuer, §13b und §17. Kontor
+						rechnet <span class="brand-text">die Sonderfälle</span> , die Standard-Software versteckt oder gar nicht kennt. </p>
 				</div>
 				<!-- feature row: KSK -->
 				<div class="mt-16 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
 					<div class="reveal order-2 lg:order-1">
 						<h3 class="font-display text-[1.9rem] font-bold leading-tight">Künstlersozialkasse, endlich
 							mitgedacht.</h3>
-						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> KSK je Monat als drei Beträge
-							<span class="brand-text">KV / RV / PV</span>, in der Reihenfolge deines Bescheids.
-							Im Monatsabschluss gepflegt, automatisch vom Vormonat geerbt: einmal eintragen, gilt fort.
-							Der Monatswert ist die Soll-Quelle für Rücklage und Jahres-KSK, die echte Abbuchung liegt als
-							<span class="brand-text">Ist</span> im Zahlungs-Ledger. </p>
+						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug"
+							style="color:var(--muted)"> KSK je Monat als drei Beträge <span class="brand-text">KV / RV /
+								PV</span>, in der Reihenfolge deines Bescheids. Im Monatsabschluss gepflegt, automatisch
+							vom Vormonat geerbt: einmal eintragen, gilt fort. Der Monatswert ist die Soll-Quelle für
+							Rücklage und Jahres-KSK, die echte Abbuchung liegt als <span class="brand-text">Ist</span>
+							im Zahlungs-Ledger. </p>
 					</div>
 					<!-- native rebuild · KSK-Werte-Inspektor -->
 					<div class="reveal pan-x d1 order-1 lg:order-2">
@@ -1727,9 +1711,10 @@
 					<div class="reveal d1">
 						<h3 class="font-display text-[1.9rem] font-bold leading-tight">UStVA, formular-getreu nach
 							ELSTER.</h3>
-						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> Keine kryptischen Summen, sondern
-							exakt die Kennzahlen aus dem Formular, mit Klartext-Label und Erklärung je Zeile. <span
-								class="brand-text">Voranmeldung wird Abschreiben.</span> </p>
+						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug"
+							style="color:var(--muted)"> Keine kryptischen Summen, sondern exakt die Kennzahlen aus dem
+							Formular, mit Klartext-Label und Erklärung je Zeile. <span class="brand-text">Voranmeldung
+								wird Abschreiben.</span> </p>
 					</div>
 				</div>
 				<!-- three cards: §13b, Rücklagen, §17 -->
@@ -1738,404 +1723,80 @@
 						style="background:var(--surface-2);border:1px solid var(--hair)">
 						<h3 class="font-display text-[1.35rem] font-bold">Reverse-Charge nach §13b</h3>
 						<p class="mt-3 leading-relaxed text-[.97rem]" style="color:var(--muted)"> Auslands-Tools (Figma,
-							ChatGPT &amp; Co.) nach §13b: USt in KZ&nbsp;84/85, zugleich als Vorsteuer abziehbar →
-							<span class="brand-text">cash-neutral</span>. Der Netto-Betrag bleibt eine echte
+							ChatGPT &amp; Co.) nach §13b: USt in KZ&nbsp;84/85, zugleich als Vorsteuer abziehbar → <span
+								class="brand-text">cash-neutral</span>. Der Netto-Betrag bleibt eine echte
 							Betriebsausgabe in der EÜR. </p>
 					</div>
 					<div class="reveal d1 rounded-2xl p-7"
 						style="background:var(--surface-2);border:1px solid var(--hair)">
 						<h3 class="font-display text-[1.35rem] font-bold">Rücklagen, die du verstehst</h3>
 						<p class="mt-3 leading-relaxed text-[.97rem]" style="color:var(--muted)"> ESt-Rücklage pauschal
-							<span class="num">(Gewinn − KSK) × Satz</span>, bewusst grob, eher konservativ. Der Satz
-							ist <span class="brand-text">monatlich justierbar</span> (z.&nbsp;B. ab Februar
-							15&nbsp;%), ohne abgeschlossene Monate anzufassen. </p>
+							<span class="num">(Gewinn − KSK) × Satz</span>, bewusst grob, eher konservativ. Der Satz ist
+							<span class="brand-text">monatlich justierbar</span> (z.&nbsp;B. ab Februar 15&nbsp;%), ohne
+							abgeschlossene Monate anzufassen. </p>
 					</div>
 					<div class="reveal d2 rounded-2xl p-7"
 						style="background:var(--surface-2);border:1px solid var(--hair)">
 						<h3 class="font-display text-[1.35rem] font-bold">Forderungsausfall nach §17</h3>
 						<p class="mt-3 leading-relaxed text-[.97rem]" style="color:var(--muted)"> Wird eine Rechnung
-							uneinbringlich, korrigiert Kontor die USt und
-							löst die ESt-Rücklage auf, im richtigen Monat. Abgeschlossene Perioden bleiben unberührt.
-						</p>
-					</div>
-				</div>
-				<!-- MCP / KI highlight -->
-				<div class="reveal mt-16 rounded-3xl overflow-hidden"
-					style="background:color-mix(in srgb,var(--brand) 8%,var(--surface))">
-					<div class="grid lg:grid-cols-2 gap-8 p-8 sm:p-12 items-center">
-						<div>
-							<h3 class="font-display text-[1.9rem] font-bold leading-tight">Frag deine Buchhaltung.
-							</h3>
-							<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> Schalt den mitgelieferten
-								MCP-Server ein, verbinde Claude und frag in normaler Sprache. Lesen über alle Module,
-								sparsames Schreiben inklusive. Alles lokal auf <span class="num">127.0.0.1</span>, Token
-								in der Keychain, Backup vor dem ersten Schreibzugriff. </p>
-							<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug brand-text">Deine KI
-								sieht deine Zahlen. Das Internet nie.</p>
-						</div>
-						<!-- mock chat -->
-						<div class="ui-card ui-hover rounded-2xl p-5 sm:p-6">
-							<div class="flex items-center gap-2 pb-4 mb-4 hairline border-b">
-								<span class="w-2.5 h-2.5 rounded-full" style="background:var(--pos)"></span>
-								<span class="num text-[.76rem]" style="color:var(--muted)">kontor · mcp ·
-									verbunden</span>
-							</div>
-							<div class="space-y-3 text-[.95rem]">
-								<div class="ml-auto max-w-[85%] rounded-2xl rounded-br-md px-4 py-2.5 btn-primary"> Wie
-									hoch ist meine Zahllast für <span class="js-quarter">Q1</span>? </div>
-								<div class="mr-auto max-w-[88%] rounded-2xl rounded-bl-md px-4 py-3"
-									style="background:var(--surface-2);border:1px solid var(--hair)"> Deine
-									USt-Vorauszahlung für <span class="js-quarter">Q1</span> <span
-										class="js-year">2026</span> beträgt <span class="num font-medium"
-										style="color:var(--ink)">2.060,30&nbsp;€</span> (KZ&nbsp;83). Fällig nach
-									Quartalsende. </div>
-								<div class="mr-auto max-w-[70%] rounded-2xl rounded-bl-md px-4 py-2.5 text-[.85rem]"
-									style="background:var(--surface-2);border:1px solid var(--hair);color:var(--muted)">
-									Quelle: UStVA · lokal gelesen </div>
-							</div>
-						</div>
+							uneinbringlich, korrigiert Kontor die USt und löst die ESt-Rücklage auf, im richtigen Monat.
+							Abgeschlossene Perioden bleiben unberührt. </p>
 					</div>
 				</div>
 			</div>
 		</section>
-		<!-- ============ §5 ALLES AN BORD ============ -->
-		<section id="anbord" class="py-24 sm:py-32" style="background:var(--bg-2)">
+		<!-- ============ ALLES ANDERE AN BORD · Bento ============ -->
+		<section id="anbord" class="py-24 sm:py-32">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<h2
-						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
-						Kein Prototyp. Fertig. </h2>
-					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Drei Zeithorizonte, ein
-						Ledger für <span class="brand-text">alle Abflüsse</span>, Banking-Import mit Triage, Belege mit
-						OCR, sanfter Einstieg mit Demodaten. </p>
+					<h2 class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">Alles andere ist auch an Bord.</h2>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)">Vom Ledger über drei Auswertungs-Ebenen bis KI-Zugriff und Backup. <span class="brand-text">Kein Prototyp, ein fertiges Werkzeug.</span></p>
 				</div>
-				<!-- three horizons -->
-				<div class="mt-12 grid md:grid-cols-3 gap-5">
-					<div class="reveal rounded-2xl p-6" style="background:var(--surface);border:1px solid var(--hair)">
-						<h3 class="font-display text-[1.2rem] font-bold">Monatsabschluss</h3>
-						<p class="mt-2 text-[.95rem] leading-relaxed" style="color:var(--muted)">Gewinn-Wasserfall,
-							Rücklagenkonto inkl. §17-Korrektur. „Monat abschließen“ friert den Stand als Snapshot ein.
-						</p>
+				<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-14">
+					<div class="reveal rounded-2xl p-8" style="background:var(--surface)">
+						<div class="grid place-items-center w-12 h-12 rounded-xl" style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+						<h3 class="font-display text-[1.4rem] font-bold mt-5">Ein Ledger für <span class="brand-text">alle</span> Abflüsse</h3>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Betriebsausgaben, Fixkosten, Subscriptions, Vorsorge (KSK) und Steuern in einer Tabelle, privat und betrieblich getrennt. Pro Posten brutto, VSt, netto und Steuerart.</p>
 					</div>
-					<div class="reveal d1 rounded-2xl p-6"
-						style="background:var(--surface);border:1px solid var(--hair)">
-						<h3 class="font-display text-[1.2rem] font-bold">UStVA</h3>
-						<p class="mt-2 text-[.95rem] leading-relaxed" style="color:var(--muted)">Pro Quartal oder Monat,
-							formular-getreu nach ELSTER, jede Kennzahl per Klick kopierbar.</p>
-					</div>
-					<div class="reveal d2 rounded-2xl p-6"
-						style="background:var(--surface);border:1px solid var(--hair)">
-						<h3 class="font-display text-[1.2rem] font-bold">Jahresabschluss (EÜR)</h3>
-						<p class="mt-2 text-[.95rem] leading-relaxed" style="color:var(--muted)">Einnahmen nach Zufluss,
-							Ausgaben nach Kategorie, Gewinn, Steuerlast, KSK-Jahr (KV/RV/PV), ESt-Abgleich.</p>
-					</div>
-				</div>
-				<!-- feature row: Ausgaben Ledger -->
-				<div class="mt-20 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-					<!-- native rebuild · Ausgaben-Ledger -->
-					<div class="reveal pan-x order-2 lg:order-1">
-						<div class="ui-card ui-hover p-4 sm:p-5">
-							<div class="flex items-center justify-between gap-3">
-								<div>
-									<div class="font-display text-[1.05rem] font-bold leading-none">Ausgaben</div>
-									<div class="text-[.8rem] mt-1.5" style="color:var(--muted)"><span
-											class="js-month">Juni</span> <span class="js-year">2026</span> · alle
-										Abflüsse</div>
-								</div>
-								<div class="flex items-center gap-1 p-1 rounded-[10px]" style="background:var(--bg-2)">
-									<span class="ui-tab on">Alle</span><span class="ui-tab">Privat</span><span
-										class="ui-tab">Betrieblich</span>
-								</div>
-							</div>
-							<div class="mt-4 flex flex-wrap gap-1.5 text-[.72rem] font-medium">
-								<span class="rounded-full px-2.5 py-1"
-									style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)">Alle</span>
-								<span class="pill rounded-full px-2.5 py-1">Fixkosten</span>
-								<span class="pill rounded-full px-2.5 py-1">Subscriptions</span>
-								<span class="pill rounded-full px-2.5 py-1">Vorsorge</span>
-								<span class="pill rounded-full px-2.5 py-1">Steuern</span>
-							</div>
-							<div class="mt-2">
-								<div class="ui-r flex items-center gap-3 py-2.5">
-									<div class="min-w-0 flex-1">
-										<div class="flex items-center gap-2"><span class="font-medium truncate">Adobe
-												Creative Cloud</span><span
-												class="text-[.6rem] rounded px-1.5 py-0.5 font-medium shrink-0"
-												style="background:color-mix(in srgb,var(--brand) 13%,transparent);color:var(--brand)">betrieblich</span>
-										</div>
-										<div class="text-[.72rem] mt-0.5" style="color:var(--muted)">Subscription ·
-											<span class="js-date" data-day="1" data-fmt="short">01.06.</span></div>
-									</div>
-									<div class="text-right shrink-0">
-										<div class="num font-medium">71,40 €</div>
-										<div class="text-[.66rem] mt-0.5" style="color:var(--muted)">VSt 11,40 · netto
-											60,00</div>
-									</div>
-								</div>
-								<div class="ui-r flex items-center gap-3 py-2.5"
-									style="border-top:1px solid var(--hair)">
-									<div class="min-w-0 flex-1">
-										<div class="flex items-center gap-2"><span
-												class="font-medium truncate">Coworking-Platz</span><span
-												class="text-[.6rem] rounded px-1.5 py-0.5 font-medium shrink-0"
-												style="background:color-mix(in srgb,var(--brand) 13%,transparent);color:var(--brand)">betrieblich</span>
-										</div>
-										<div class="text-[.72rem] mt-0.5" style="color:var(--muted)">Fixkosten · <span
-												class="js-date" data-day="1" data-fmt="short">01.06.</span></div>
-									</div>
-									<div class="text-right shrink-0">
-										<div class="num font-medium">178,50 €</div>
-										<div class="text-[.66rem] mt-0.5" style="color:var(--muted)">VSt 28,50 · netto
-											150,00</div>
-									</div>
-								</div>
-								<div class="ui-r flex items-center gap-3 py-2.5"
-									style="border-top:1px solid var(--hair)">
-									<div class="min-w-0 flex-1">
-										<div class="flex items-center gap-2"><span class="font-medium truncate">Figma
-												Professional</span><span
-												class="text-[.6rem] rounded px-1.5 py-0.5 font-medium shrink-0"
-												style="background:color-mix(in srgb,var(--brand) 13%,transparent);color:var(--brand)">betrieblich</span>
-										</div>
-										<div class="text-[.72rem] mt-0.5" style="color:var(--muted)">Subscription ·
-											<span class="js-date" data-day="3" data-fmt="short">03.06.</span></div>
-									</div>
-									<div class="text-right shrink-0">
-										<div class="num font-medium">18,00 €</div>
-										<div class="text-[.66rem] mt-0.5" style="color:var(--brand)">§13b Reverse-Charge
-										</div>
-									</div>
-								</div>
-								<div class="ui-r flex items-center gap-3 py-2.5"
-									style="border-top:1px solid var(--hair)">
-									<div class="min-w-0 flex-1">
-										<div class="flex items-center gap-2"><span class="font-medium truncate">Miete
-												Wohnung</span><span
-												class="text-[.6rem] rounded px-1.5 py-0.5 font-medium shrink-0"
-												style="background:var(--bg-2);color:var(--muted);border:1px solid var(--hair)">privat</span>
-										</div>
-										<div class="text-[.72rem] mt-0.5" style="color:var(--muted)">Fixkosten · <span
-												class="js-date" data-day="1" data-fmt="short">01.06.</span></div>
-									</div>
-									<div class="text-right shrink-0">
-										<div class="num font-medium">1.150,00 €</div>
-										<div class="text-[.66rem] mt-0.5" style="color:var(--muted)">netto 1.150,00
-										</div>
-									</div>
-								</div>
-								<div class="ui-r flex items-center gap-3 py-2.5"
-									style="border-top:1px solid var(--hair)">
-									<div class="min-w-0 flex-1">
-										<div class="flex items-center gap-2"><span
-												class="font-medium truncate">Mobilfunk</span><span
-												class="text-[.6rem] rounded px-1.5 py-0.5 font-medium shrink-0"
-												style="background:var(--bg-2);color:var(--muted);border:1px solid var(--hair)">privat</span>
-										</div>
-										<div class="text-[.72rem] mt-0.5" style="color:var(--muted)">Fixkosten · <span
-												class="js-date" data-day="15" data-fmt="short">15.06.</span></div>
-									</div>
-									<div class="text-right shrink-0">
-										<div class="num font-medium">39,00 €</div>
-										<div class="text-[.66rem] mt-0.5" style="color:var(--muted)">netto 39,00</div>
-									</div>
-								</div>
-							</div>
-							<div class="mt-3 pt-3 flex items-center justify-between text-[.8rem]"
-								style="border-top:1px solid var(--hair)">
-								<span style="color:var(--muted)">67 Einträge</span>
-								<span>Summe · <span class="num font-semibold">14.614,68 €</span></span>
-							</div>
+					<div class="reveal d1 rounded-2xl p-8" style="background:var(--surface)">
+						<div class="grid place-items-center w-12 h-12 rounded-xl" style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12.5" y="8" width="3" height="10"/><rect x="18" y="5" width="3" height="13"/></svg></div>
+						<h3 class="font-display text-[1.4rem] font-bold mt-5">Auswertungen in drei Ebenen</h3>
+						<div class="mt-3 space-y-2 leading-relaxed">
+							<div class="flex items-start gap-2.5"><span class="num text-[.9rem] shrink-0" style="color:var(--brand)">·</span><span style="color:var(--ink-2)"><span class="brand-text">Monatsabschluss</span>: Gewinn-Wasserfall und Rücklagen, als Snapshot eingefroren.</span></div>
+							<div class="flex items-start gap-2.5"><span class="num text-[.9rem] shrink-0" style="color:var(--brand)">·</span><span style="color:var(--ink-2)"><span class="brand-text">UStVA</span>: ELSTER-Kennzahlen formular-getreu, jede Zahl kopierbar.</span></div>
+							<div class="flex items-start gap-2.5"><span class="num text-[.9rem] shrink-0" style="color:var(--brand)">·</span><span style="color:var(--ink-2)"><span class="brand-text">Jahresabschluss (EÜR)</span>: Gewinn, Steuerlast, KSK-Jahr und ESt-Abgleich.</span></div>
 						</div>
 					</div>
-					<div class="reveal d1 order-1 lg:order-2">
-						<h3 class="font-display text-[1.7rem] font-bold leading-tight">Ein Ledger für <span class="brand-text">alle</span>
-							Abflüsse.</h3>
-						<p class="mt-4 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)"> Betriebsausgaben, Fixkosten,
-							Subscriptions, Vorsorge (KSK) und Steuern in einer Tabelle, gefiltert nach Art, Sparte,
-							Monat. Pro Posten brutto/VSt/netto und Steuerart. Wiederkehrendes als datierte Buchungen, per
-							Klick oder „Vormonat duplizieren“. <span class="brand-text">Privat und betrieblich sauber
-							getrennt.</span> </p>
+					<div class="reveal d2 rounded-2xl p-8" style="background:var(--surface)">
+						<div class="grid place-items-center w-12 h-12 rounded-xl" style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15l-1.9-4.1L5.5 9l4.6-1.4z"/></svg></div>
+						<h3 class="font-display text-[1.4rem] font-bold mt-5">Frag deine Buchhaltung</h3>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Lokaler MCP-Server, verbinde Claude und frag in normaler Sprache. Alles lokal auf <span class="num">127.0.0.1</span>.</p>
+						<p class="mt-3 font-display text-[1.1rem] font-semibold leading-snug brand-text">Deine KI sieht deine Zahlen. Das Internet nie.</p>
 					</div>
-				</div>
-				<!-- two-up gallery: Jahresabschluss + Privat -->
-				<div class="mt-20 grid md:grid-cols-2 gap-8">
-					<div class="reveal">
-						<!-- native rebuild · Jahresabschluss / EÜR -->
-						<div class="pan-x">
-							<div class="ui-card ui-hover overflow-hidden">
-								<div class="p-5 grid grid-cols-2 gap-4 text-white"
-									style="background:#2463EB">
-									<div>
-										<div class="text-[.72rem]" style="opacity:.88">Gewinn (EÜR)</div>
-										<div class="num text-[1.45rem] font-semibold mt-1 leading-none">13.976,00 €
-										</div>
-									</div>
-									<div>
-										<div class="text-[.72rem]" style="opacity:.88">Steuerlast · gesch.</div>
-										<div class="num text-[1.45rem] font-semibold mt-1 leading-none">5.580,00 €</div>
-									</div>
-								</div>
-								<div class="p-5 pb-10">
-									<div class="eyebrow normal-case tracking-[.1em]">Einnahmenüberschuss · EÜR</div>
-									<div class="mt-2.5">
-										<div class="ui-r flex items-center justify-between py-2"><span
-												style="color:var(--ink-2)">Betriebseinnahmen · Zufluss</span><span
-												class="num">16.700,00 €</span></div>
-										<div class="ui-r flex items-center justify-between py-2"
-											style="border-top:1px solid var(--hair)"><span
-												style="color:var(--muted)">Laufende Ausgaben</span><span class="num">−
-												1.524,00 €</span></div>
-										<div class="ui-r flex items-center justify-between py-2"
-											style="border-top:1px solid var(--hair)"><span
-												style="color:var(--muted)">Anschaffungen · Sofortabzug</span><span
-												class="num">− 1.200,00 €</span></div>
-										<div class="ui-r flex items-center justify-between py-2.5 mt-1 rounded-lg px-2"
-											style="background:color-mix(in srgb,var(--pos) 12%,transparent)"><span
-												class="font-semibold">= Gewinn (EÜR)</span><span class="num font-medium"
-												style="color:var(--pos)">13.976,00 €</span></div>
-									</div>
-									<div class="eyebrow normal-case tracking-[.1em] mt-5">Einkommensteuer · Rücklage
-									</div>
-									<div class="mt-2.5">
-										<div class="ui-r flex items-center justify-between py-2"><span
-												style="color:var(--ink-2)">Gewinn (EÜR)</span><span
-												class="num">13.976,00 €</span></div>
-										<div class="ui-r flex items-center justify-between py-2"
-											style="border-top:1px solid var(--hair)"><span style="color:var(--muted)">−
-												Vorsorge (KSK)</span><span class="num">− 2.520,00 €</span></div>
-										<div class="ui-r flex items-center justify-between py-2"
-											style="border-top:1px solid var(--hair)"><span
-												style="color:var(--muted)">Steuerpfl. Gewinn · grob</span><span
-												class="num">11.456,00 €</span></div>
-										<div class="ui-r flex items-center justify-between py-2.5 mt-1 rounded-lg px-2"
-											style="background:color-mix(in srgb,var(--brand-2) 12%,transparent)"><span
-												class="font-semibold">ESt-Rücklage · pauschal</span><span
-												class="num font-medium" style="color:var(--brand-2)">2.228,40 €</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<h3 class="font-display text-[1.3rem] font-bold mt-5">Jahresabschluss</h3>
-						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">EÜR nach Zufluss,
-							ESt-Abgleich (Schätzung vs. tatsächlich geleistet), Beleg-Export pro Jahr.</p>
+					<div class="reveal rounded-2xl p-8" style="background:var(--surface)">
+						<div class="grid place-items-center w-12 h-12 rounded-xl" style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.4-4 4.3-6 8-6s6.6 2 8 6"/></svg></div>
+						<h3 class="font-display text-[1.4rem] font-bold mt-5">Privat, getrennt</h3>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Lebensmittel und Anschaffungen mit optionalen Budgets, sauber vom Betrieblichen getrennt.</p>
 					</div>
-					<div class="reveal d1">
-						<!-- native rebuild · Privat-Übersicht -->
-						<div class="pan-x">
-							<div class="ui-card ui-hover p-5">
-								<div class="flex items-center justify-between">
-									<div>
-										<div class="font-display text-[1.05rem] font-bold leading-none">Privatausgaben
-										</div>
-										<div class="text-[.8rem] mt-1.5" style="color:var(--muted)"><span
-												class="js-year">2026</span> · pro Monat</div>
-									</div>
-									<div class="flex items-center gap-1 p-1 rounded-[10px]"
-										style="background:var(--bg-2)"><span class="ui-tab on">Gesamt</span><span
-											class="ui-tab">Essen</span></div>
-								</div>
-								<div id="pv-chart" class="mt-5 flex items-end gap-1 h-24">
-									<div class="flex-1 flex flex-col justify-end h-full"><span
-											class="bar-grow rounded-t"
-											style="height:89%;background:#2463EB"></span>
-									</div>
-									<div class="flex-1 flex flex-col justify-end h-full"><span
-											class="bar-grow rounded-t"
-											style="height:100%;background:#2463EB"></span>
-									</div>
-									<div class="flex-1 flex flex-col justify-end h-full"><span
-											class="bar-grow rounded-t"
-											style="height:98%;background:#2463EB"></span>
-									</div>
-									<div class="flex-1 flex flex-col justify-end h-full"><span
-											class="bar-grow rounded-t"
-											style="height:94%;background:#2463EB"></span>
-									</div>
-									<div class="flex-1 flex flex-col justify-end h-full"><span
-											class="bar-grow rounded-t"
-											style="height:99%;background:#2463EB"></span>
-									</div>
-									<div class="flex-1 flex flex-col justify-end h-full"><span
-											class="bar-grow rounded-t"
-											style="height:94%;background:#2463EB"></span>
-									</div>
-									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
-											style="height:8%;background:var(--bg-2)"></span></div>
-									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
-											style="height:8%;background:var(--bg-2)"></span></div>
-									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
-											style="height:8%;background:var(--bg-2)"></span></div>
-									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
-											style="height:8%;background:var(--bg-2)"></span></div>
-									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
-											style="height:8%;background:var(--bg-2)"></span></div>
-									<div class="flex-1 flex flex-col justify-end h-full"><span class="rounded-t"
-											style="height:8%;background:var(--bg-2)"></span></div>
-								</div>
-								<div class="flex gap-1 mt-1.5 text-[.55rem] text-center" style="color:var(--muted)">
-									<span class="flex-1">J</span><span class="flex-1">F</span><span
-										class="flex-1">M</span><span class="flex-1">A</span><span
-										class="flex-1">M</span><span class="flex-1">J</span><span
-										class="flex-1">J</span><span class="flex-1">A</span><span
-										class="flex-1">S</span><span class="flex-1">O</span><span
-										class="flex-1">N</span><span class="flex-1">D</span>
-								</div>
-								<div class="mt-4 grid grid-cols-2 gap-2">
-									<div class="rounded-lg p-2.5"
-										style="background:var(--surface-2);border:1px solid var(--hair)">
-										<div class="text-[.66rem]" style="color:var(--muted)">Fixkosten · <span
-												class="js-month">Juni</span></div>
-										<div class="num font-semibold mt-0.5">1.267,00 €</div>
-									</div>
-									<div class="rounded-lg p-2.5"
-										style="background:var(--surface-2);border:1px solid var(--hair)">
-										<div class="text-[.66rem]" style="color:var(--muted)">Subscriptions</div>
-										<div class="num font-semibold mt-0.5">24,98 €</div>
-									</div>
-									<div class="rounded-lg p-2.5"
-										style="background:var(--surface-2);border:1px solid var(--hair)">
-										<div class="text-[.66rem]" style="color:var(--muted)">Lebensmittel</div>
-										<div class="num font-semibold mt-0.5">106,50 €</div>
-									</div>
-									<div class="rounded-lg p-2.5"
-										style="background:var(--surface-2);border:1px solid var(--hair)">
-										<div class="text-[.66rem]" style="color:var(--muted)">Einkäufe</div>
-										<div class="num font-semibold mt-0.5">0,00 €</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<h3 class="font-display text-[1.3rem] font-bold mt-5">Privat, getrennt gehalten</h3>
-						<p class="mt-2 leading-relaxed text-[.97rem]" style="color:var(--muted)">Privat-Übersicht,
-							Lebensmittel &amp; Anschaffungen mit optionalen Budgets, sauber vom Betrieblichen getrennt.
-						</p>
+					<div class="reveal d1 rounded-2xl p-8" style="background:var(--surface)">
+						<div class="grid place-items-center w-12 h-12 rounded-xl" style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+						<h3 class="font-display text-[1.4rem] font-bold mt-5">Wiederkehrende Fristen</h3>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Monatlich, quartalsweise, jährlich. Abgehakt, die nächste Fälligkeit erscheint von selbst.</p>
 					</div>
-				</div>
-				<!-- compact capability grid -->
-				<div class="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-					<div class="reveal rounded-xl p-5" style="background:var(--surface);border:1px solid var(--hair)">
-						<h4 class="font-semibold">Sanfter Einstieg</h4>
-						<p class="mt-1.5 text-[.9rem] leading-relaxed" style="color:var(--muted)">Leer beginnen oder mit
-							Demodaten ausprobieren, risikofrei, jederzeit löschbar.</p>
+					<div class="reveal d2 rounded-2xl p-8" style="background:var(--surface)">
+						<div class="grid place-items-center w-12 h-12 rounded-xl" style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+						<h3 class="font-display text-[1.4rem] font-bold mt-5">Auto-Backup</h3>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Täglich, mit Belegen. JSON-Export und -Import, dedupliziert.</p>
 					</div>
-					<div class="reveal d1 rounded-xl p-5"
-						style="background:var(--surface);border:1px solid var(--hair)">
-						<h4 class="font-semibold">Beleg-Export (ZIP)</h4>
-						<p class="mt-1.5 text-[.9rem] leading-relaxed" style="color:var(--muted)">Pro Jahr, für
-							Steuerberater oder Betriebsprüfung.</p>
+					<div class="reveal rounded-2xl p-8" style="background:var(--surface)">
+						<div class="grid place-items-center w-12 h-12 rounded-xl" style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+						<h3 class="font-display text-[1.4rem] font-bold mt-5">Beleg-Export (ZIP)</h3>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ein ZIP pro Jahr mit allen Belegen, fertig für Steuerberatung oder Betriebsprüfung.</p>
 					</div>
-					<div class="reveal d2 rounded-xl p-5"
-						style="background:var(--surface);border:1px solid var(--hair)">
-						<h4 class="font-semibold">Aufgaben</h4>
-						<p class="mt-1.5 text-[.9rem] leading-relaxed" style="color:var(--muted)">Einmalig, monatlich,
-							quartalsweise, jährlich. Abgehakt → nächste Fälligkeit erscheint von selbst.</p>
-					</div>
-					<div class="reveal d3 rounded-xl p-5"
-						style="background:var(--surface);border:1px solid var(--hair)">
-						<h4 class="font-semibold">Auto-Backup</h4>
-						<p class="mt-1.5 text-[.9rem] leading-relaxed" style="color:var(--muted)">Täglich,
-							Komplett-Backup mit Belegen, JSON-Export/-Import (dedupliziert).</p>
+					<div class="reveal d1 rounded-2xl p-8" style="background:var(--surface)">
+						<div class="grid place-items-center w-12 h-12 rounded-xl" style="background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l6 3.5-6 3.5z"/></svg></div>
+						<h3 class="font-display text-[1.4rem] font-bold mt-5">Sanfter Einstieg</h3>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Leer beginnen oder mit Demodaten ausprobieren, risikofrei und jederzeit löschbar.</p>
 					</div>
 				</div>
 			</div>
@@ -2144,13 +1805,13 @@
 		<section class="py-24 sm:py-32" style="background:var(--bg-2)">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<h2
-						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+					<h2 class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Erkennst du dich wieder? </h2>
 				</div>
-				<p class="mt-6 max-w-3xl reveal font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)">Kontor ist
-					für <span class="brand-text">KSK-versicherte Kreative mit Regelbesteuerung</span> gebaut,
-					ob 7&nbsp;%, 19&nbsp;% oder beides. <span class="brand-text">Sechs typische Fälle:</span></p>
+				<p class="mt-6 max-w-3xl reveal font-display text-[1.25rem] font-semibold leading-snug"
+					style="color:var(--muted)">Kontor ist für <span class="brand-text">KSK-versicherte Kreative mit
+						Regelbesteuerung</span> gebaut, ob 7&nbsp;%, 19&nbsp;% oder beides. <span
+						class="brand-text">Sechs typische Fälle:</span></p>
 				<div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
 					<!-- Persona · Designer -->
 					<div class="reveal rounded-2xl p-8"
@@ -2265,80 +1926,17 @@
 				<p class="mt-6 max-w-3xl reveal text-[.9rem] leading-relaxed" style="color:var(--muted)">Welcher Satz
 					konkret gilt, hängt vom Einzelfall ab (Schöpfungshöhe, Verwertungsart). Kontor rechnet mit dem Satz,
 					den du wählst. Die Einordnung bleibt bei dir oder deiner Steuerberatung.</p>
-				<div class="mt-12 grid lg:grid-cols-2 gap-5">
-					<div class="reveal rounded-2xl p-8" style="background:var(--surface)">
-						<h3 class="font-display text-[1.5rem] font-bold">Kontor ist für dich, wenn du …</h3>
-						<ul class="mt-6 space-y-4 text-[1.05rem]">
-							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-									stroke-linecap="round" stroke-linejoin="round">
-									<path d="M20 6L9 17l-5-5" />
-								</svg><span style="color:var(--ink-2)">als <span class="brand-text">Kreativer</span>
-									fakturierst, mit 7&nbsp;%, 19&nbsp;% oder beidem</span></li>
-							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-									stroke-linecap="round" stroke-linejoin="round">
-									<path d="M20 6L9 17l-5-5" />
-								</svg><span style="color:var(--ink-2)">deine <span class="brand-text">EÜR</span> selbst
-									machst und quartalsweise <span class="brand-text">UStVA</span> abgibst</span></li>
-							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-									stroke-linecap="round" stroke-linejoin="round">
-									<path d="M20 6L9 17l-5-5" />
-								</svg><span style="color:var(--ink-2)"><span class="brand-text">KSK-versichert</span> bist
-									oder es bald wirst</span></li>
-							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-									stroke-linecap="round" stroke-linejoin="round">
-									<path d="M20 6L9 17l-5-5" />
-								</svg><span style="color:var(--ink-2)">deine Zahlen lieber <span
-										class="brand-text">lokal</span> hast als in der Cloud</span></li>
-							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--pos)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-									stroke-linecap="round" stroke-linejoin="round">
-									<path d="M20 6L9 17l-5-5" />
-								</svg><span style="color:var(--ink-2)">eine App willst, die <span
-										class="brand-text">deinen</span> Fall kann</span></li>
-						</ul>
-					</div>
-					<div class="reveal d1 rounded-2xl p-8"
-						style="background:color-mix(in srgb,var(--surface) 50%,transparent)">
-						<h3 class="font-display text-[1.5rem] font-bold" style="color:var(--muted)">(Noch) nicht für
-							dich, wenn du …</h3>
-						<ul class="mt-6 space-y-4 text-[1.05rem]">
-							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--muted)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-									stroke-linecap="round" stroke-linejoin="round">
-									<path d="M18 6L6 18M6 6l12 12" />
-								</svg><span style="color:var(--muted)">Ist-Versteuerung oder Kleinunternehmer (§19)
-									brauchst</span></li>
-							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--muted)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-									stroke-linecap="round" stroke-linejoin="round">
-									<path d="M18 6L6 18M6 6l12 12" />
-								</svg><span style="color:var(--muted)">überwiegend steuerfreie Umsätze hast</span></li>
-							<li class="flex gap-3"><svg class="w-5 h-5 mt-0.5 shrink-0" style="color:var(--muted)"
-									viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-									stroke-linecap="round" stroke-linejoin="round">
-									<path d="M18 6L6 18M6 6l12 12" />
-								</svg><span style="color:var(--muted)">eine GmbH mit Buchführung, Lohn und Team
-									führst</span></li>
-						</ul>
-						<p class="mt-6 text-[.95rem]" style="color:var(--muted)">Nicht deine Baustelle? Auch gut.</p>
-					</div>
-				</div>
 			</div>
 		</section>
 		<!-- ============ SCREENSHOT-GALERIE (echte App-Aufnahmen) ============ -->
 		<section id="galerie" class="py-24 sm:py-32">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<h2
-						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+					<h2 class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Echte Aufnahmen aus Kontor. </h2>
-					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Kein Mockup-Zauber,
-						<span class="brand-text">das ist die App</span>. Wisch dich seitlich durch<span
-							class="hidden md:inline"> und klick zum Vergrößern</span>. </p>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance"
+						style="color:var(--muted)"> Kein Mockup-Zauber, <span class="brand-text">das ist die App</span>.
+						Wisch dich seitlich durch<span class="hidden md:inline"> und klick zum Vergrößern</span>. </p>
 				</div>
 			</div>
 			<div class="gal-scroll mt-12 flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory px-5 sm:px-8 py-2">
@@ -2440,14 +2038,14 @@
 			</div>
 		</section>
 		<!-- ============ §8 TECHNIK & VERTRAUEN ============ -->
-		<section class="py-24 sm:py-32">
+		<section class="py-24 sm:py-32" style="background:var(--bg-2)">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<h2
-						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+					<h2 class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Prüf den Code, nicht nur das Versprechen. </h2>
-					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance" style="color:var(--muted)"> Local-first, quelloffen,
-						getestet. <span class="brand-text">Vertrauen, das man nachlesen kann.</span> </p>
+					<p class="mt-6 font-display text-[1.25rem] font-semibold leading-snug text-balance"
+						style="color:var(--muted)"> Local-first, quelloffen, getestet. <span
+							class="brand-text">Vertrauen, das man nachlesen kann.</span> </p>
 				</div>
 				<div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
 					<div class="reveal rounded-2xl p-7"
@@ -2494,16 +2092,14 @@
 		<section id="preis" hidden class="py-24 sm:py-32" style="background:var(--bg-2)">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
 				<div class="max-w-3xl reveal">
-					<h2
-						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+					<h2 class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Kaufen oder selbst bauen. Kein Abo, keine Tricks. </h2>
 				</div>
 				<div class="mt-12 grid lg:grid-cols-2 gap-5 items-stretch">
 					<!-- Einmalkauf (highlight) -->
 					<div class="reveal relative rounded-3xl p-8 sm:p-10 overflow-hidden"
 						style="background:var(--surface);border:1px solid color-mix(in srgb,var(--brand) 40%,var(--hair));box-shadow:var(--shadow)">
-						<div class="absolute inset-x-0 top-0 h-1"
-							style="background:#2463EB"></div>
+						<div class="absolute inset-x-0 top-0 h-1" style="background:#2463EB"></div>
 						<div class="flex items-center justify-between">
 							<span class="font-semibold text-[.95rem]">Einmalkauf</span>
 							<span class="rounded-full px-3 py-1 text-[.74rem] font-semibold"
@@ -2549,8 +2145,8 @@
 							<li class="flex gap-2.5"><span class="num shrink-0" style="color:var(--brand)">↳</span><span
 									style="color:var(--ink-2)">Forken, anpassen, selbst bauen – frei</span></li>
 							<li class="flex gap-2.5"><span class="num shrink-0" style="color:var(--brand)">↳</span><span
-									style="color:var(--ink-2)">Nur für <span class="brand-text">dich</span>,
-									kein Weiterverkauf</span></li>
+									style="color:var(--ink-2)">Nur für <span class="brand-text">dich</span>, kein
+									Weiterverkauf</span></li>
 							<li class="flex gap-2.5"><span class="num shrink-0" style="color:var(--brand)">↳</span><span
 									style="color:var(--ink-2)">Hilft dir Kontor? Ich freue mich über eine Spende
 									☕</span></li>
@@ -2576,75 +2172,191 @@
 		<section id="faq" class="py-24 sm:py-32">
 			<div class="mx-auto max-w-3xl px-5 sm:px-8">
 				<div class="reveal text-center">
-					<h2
-						class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+					<h2 class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
 						Häufige Fragen, ehrlich beantwortet. </h2>
 				</div>
-				<div class="reveal mt-12">
+								<div class="reveal mt-12">
 					<details class="faq py-5">
 						<summary class="flex items-center justify-between gap-4"><span
-								class="font-medium text-[1.08rem]">Brauche ich ein Konto oder Internet?</span><span
+								class="font-medium text-[1.08rem]">Welche Buchhaltungs-App eignet sich für KSK-versicherte Kreative auf dem Mac?</span><span
 								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Nein. Kontor läuft komplett offline.
-							Du brauchst kein Konto, keinen Login.</p>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Kontor ist eine native macOS-Buchhaltung speziell für KSK-versicherte Kreative und Freiberufler mit Regelbesteuerung. Sie rechnet EÜR, Umsatzsteuer-Voranmeldung (7 % und 19 %), KSK und Rücklagen steuerlich korrekt, komplett lokal auf dem Mac.</p>
 					</details>
 					<details class="faq py-5">
 						<summary class="flex items-center justify-between gap-4"><span
-								class="font-medium text-[1.08rem]">Wo liegen meine Daten?</span><span
+								class="font-medium text-[1.08rem]">Für wen ist Kontor geeignet und für wen nicht?</span><span
 								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ausschließlich auf deinem Mac, im
-							sandboxed App-Container. Backups schreibst du als Datei, wohin du willst.</p>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ideal, wenn du als Kreativer regelbesteuert fakturierst (7 %, 19 % oder beides), deine EÜR selbst machst, quartalsweise UStVA abgibst, KSK-versichert bist und deine Zahlen lieber lokal statt in der Cloud hast. Weniger passend bei Ist-Versteuerung, Kleinunternehmer (§19), überwiegend steuerfreien Umsätzen oder einer GmbH mit doppelter Buchführung, Lohn und Team.</p>
+					</details>
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Ist Kontor eine Alternative zu lexoffice oder DATEV?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ja, als lokale, abo-freie Alternative für Solo-Kreative. Kontor läuft ohne Cloud und ohne Konto direkt auf dem Mac. Statt monatlicher Gebühr gibt es einen kostenlosen Download.</p>
+					</details>
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Brauche ich für Kontor ein Konto oder eine Internetverbindung?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Nein. Kontor läuft komplett offline, ohne Konto und ohne Login. Deine Daten verlassen den Mac nicht.</p>
+					</details>
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Wo werden meine Buchhaltungsdaten gespeichert?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ausschließlich lokal auf deinem Mac, im sandboxed App-Container. Backups schreibst du als Datei dorthin, wo du willst.</p>
 					</details>
 					<details class="faq py-5">
 						<summary class="flex items-center justify-between gap-4"><span
 								class="font-medium text-[1.08rem]">Was kostet Kontor?</span><span
 								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Nichts – Kontor ist kostenlos und
-							quelloffen. Lade sie gratis aus dem Mac App Store, aus den GitHub-Releases oder bau sie selbst. Kein Abo,
-							keine Folgekosten. Freiwillige Spenden sind willkommen.</p>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Nichts. Kontor ist kostenlos und quelloffen: im Mac App Store, über die GitHub-Releases oder selbst gebaut. Kein Abo, keine Folgekosten. Freiwillige Spenden sind willkommen.</p>
 					</details>
 					<details class="faq py-5">
 						<summary class="flex items-center justify-between gap-4"><span
-								class="font-medium text-[1.08rem]">Kann ich meine Bankumsätze importieren?</span><span
+								class="font-medium text-[1.08rem]">Kann ich meine Bankumsätze (Sparkasse CSV/CAMT) importieren?</span><span
 								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ja – den CSV-CAMT-Export deiner
-							Sparkasse. Du ordnest jede Buchung selbst zu, Kontor lernt mit und schlägt künftig vor.</p>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ja, über den CSV-CAMT-Export deiner Sparkasse. Du ordnest jede Buchung zu, Kontor lernt mit und schlägt künftig passende Zuordnungen vor.</p>
 					</details>
 					<details class="faq py-5">
 						<summary class="flex items-center justify-between gap-4"><span
-								class="font-medium text-[1.08rem]">Macht Kontor meine UStVA fertig?</span><span
+								class="font-medium text-[1.08rem]">Erstellt Kontor meine Umsatzsteuer-Voranmeldung für ELSTER?</span><span
 								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Es liefert dir alle ELSTER-Kennzahlen
-							formular-getreu zum Übertragen. (ELSTER-Direktversand: Roadmap.)</p>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Kontor liefert alle ELSTER-Kennzahlen formular-getreu zum Übertragen, jede Zahl per Klick kopierbar. Der ELSTER-Direktversand ist auf der Roadmap.</p>
 					</details>
 					<details class="faq py-5">
 						<summary class="flex items-center justify-between gap-4"><span
-								class="font-medium text-[1.08rem]">Und die KI – sieht die meine Daten?</span><span
+								class="font-medium text-[1.08rem]">Rechnet Kontor KSK, §13b Reverse-Charge und Rücklagen korrekt?</span><span
 								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Nur wenn du den MCP-Server
-							einschaltest, und auch dann nur lokal. Nichts geht ins Internet.</p>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ja. KSK je Monat (KV/RV/PV), §13b für Auslands-Tools, der §17-Forderungsausfall und die pauschale ESt-Rücklage sind eingebaut und gegen nachrechenbare Werte geprüft.</p>
 					</details>
 					<details class="faq py-5">
 						<summary class="flex items-center justify-between gap-4"><span
-								class="font-medium text-[1.08rem]">Darf ich Kontor anpassen / forken?</span><span
+								class="font-medium text-[1.08rem]">Sieht die KI über den MCP-Server meine Buchhaltungsdaten?</span><span
 								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ja, für dich selbst – ausdrücklich
-							erwünscht. Du darfst deinen Fork nur nicht verkaufen oder als konkurrierendes Produkt
-							weitergeben.</p>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Nur wenn du den lokalen MCP-Server einschaltest, und auch dann nur auf 127.0.0.1. Nichts geht ins Internet.</p>
 					</details>
 					<details class="faq py-5">
 						<summary class="flex items-center justify-between gap-4"><span
-								class="font-medium text-[1.08rem]">Funktioniert das mit meinem
-								Steuerberater?</span><span class="chev num shrink-0" style="color:var(--brand)">+</span>
-						</summary>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ja: Beleg-Export als ZIP pro Jahr und
-							JSON-Export für alles Übrige.</p>
+								class="font-medium text-[1.08rem]">Wie installiere ich Kontor ohne den Mac App Store?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Über GitHub: per Homebrew oder als ZIP aus den Releases. Die genauen Schritte stehen im GitHub-Repo. Diese Community-Builds sind quelloffen, aber nicht signiert, beim ersten Start also Rechtsklick aufs App-Icon und „Öffnen“.</p>
+					</details>
+					<details class="faq py-5">
+						<summary class="flex items-center justify-between gap-4"><span
+								class="font-medium text-[1.08rem]">Darf ich Kontor forken und mit meinem Steuerberater nutzen?</span><span
+								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Ja. Für den Eigenbedarf ist Forken ausdrücklich erwünscht (nur kein Verkauf oder Konkurrenzprodukt). Für die Steuerberatung gibt es Beleg-Export als ZIP pro Jahr und JSON-Export für alles Übrige.</p>
 					</details>
 				</div>
+				<script type="application/ld+json">
+					{
+					  "@context": "https://schema.org",
+					  "@type": "FAQPage",
+					  "mainEntity": [
+					    {
+					      "@type": "Question",
+					      "name": "Welche Buchhaltungs-App eignet sich für KSK-versicherte Kreative auf dem Mac?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Kontor ist eine native macOS-Buchhaltung speziell für KSK-versicherte Kreative und Freiberufler mit Regelbesteuerung. Sie rechnet EÜR, Umsatzsteuer-Voranmeldung (7 % und 19 %), KSK und Rücklagen steuerlich korrekt, komplett lokal auf dem Mac."
+					      }
+					    },
+					    {
+					      "@type": "Question",
+					      "name": "Für wen ist Kontor geeignet und für wen nicht?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Ideal, wenn du als Kreativer regelbesteuert fakturierst (7 %, 19 % oder beides), deine EÜR selbst machst, quartalsweise UStVA abgibst, KSK-versichert bist und deine Zahlen lieber lokal statt in der Cloud hast. Weniger passend bei Ist-Versteuerung, Kleinunternehmer (§19), überwiegend steuerfreien Umsätzen oder einer GmbH mit doppelter Buchführung, Lohn und Team."
+					      }
+					    },
+					    {
+					      "@type": "Question",
+					      "name": "Ist Kontor eine Alternative zu lexoffice oder DATEV?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Ja, als lokale, abo-freie Alternative für Solo-Kreative. Kontor läuft ohne Cloud und ohne Konto direkt auf dem Mac. Statt monatlicher Gebühr gibt es einen kostenlosen Download."
+					      }
+					    },
+					    {
+					      "@type": "Question",
+					      "name": "Brauche ich für Kontor ein Konto oder eine Internetverbindung?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Nein. Kontor läuft komplett offline, ohne Konto und ohne Login. Deine Daten verlassen den Mac nicht."
+					      }
+					    },
+					    {
+					      "@type": "Question",
+					      "name": "Wo werden meine Buchhaltungsdaten gespeichert?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Ausschließlich lokal auf deinem Mac, im sandboxed App-Container. Backups schreibst du als Datei dorthin, wo du willst."
+					      }
+					    },
+					    {
+					      "@type": "Question",
+					      "name": "Was kostet Kontor?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Nichts. Kontor ist kostenlos und quelloffen: im Mac App Store, über die GitHub-Releases oder selbst gebaut. Kein Abo, keine Folgekosten. Freiwillige Spenden sind willkommen."
+					      }
+					    },
+					    {
+					      "@type": "Question",
+					      "name": "Kann ich meine Bankumsätze (Sparkasse CSV/CAMT) importieren?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Ja, über den CSV-CAMT-Export deiner Sparkasse. Du ordnest jede Buchung zu, Kontor lernt mit und schlägt künftig passende Zuordnungen vor."
+					      }
+					    },
+					    {
+					      "@type": "Question",
+					      "name": "Erstellt Kontor meine Umsatzsteuer-Voranmeldung für ELSTER?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Kontor liefert alle ELSTER-Kennzahlen formular-getreu zum Übertragen, jede Zahl per Klick kopierbar. Der ELSTER-Direktversand ist auf der Roadmap."
+					      }
+					    },
+					    {
+					      "@type": "Question",
+					      "name": "Rechnet Kontor KSK, §13b Reverse-Charge und Rücklagen korrekt?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Ja. KSK je Monat (KV/RV/PV), §13b für Auslands-Tools, der §17-Forderungsausfall und die pauschale ESt-Rücklage sind eingebaut und gegen nachrechenbare Werte geprüft."
+					      }
+					    },
+					    {
+					      "@type": "Question",
+					      "name": "Sieht die KI über den MCP-Server meine Buchhaltungsdaten?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Nur wenn du den lokalen MCP-Server einschaltest, und auch dann nur auf 127.0.0.1. Nichts geht ins Internet."
+					      }
+					    },
+					    {
+					      "@type": "Question",
+					      "name": "Wie installiere ich Kontor ohne den Mac App Store?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Über GitHub: per Homebrew oder als ZIP aus den Releases. Die genauen Schritte stehen im GitHub-Repo. Diese Community-Builds sind quelloffen, aber nicht signiert, beim ersten Start also Rechtsklick aufs App-Icon und „Öffnen“."
+					      }
+					    },
+					    {
+					      "@type": "Question",
+					      "name": "Darf ich Kontor forken und mit meinem Steuerberater nutzen?",
+					      "acceptedAnswer": {
+					        "@type": "Answer",
+					        "text": "Ja. Für den Eigenbedarf ist Forken ausdrücklich erwünscht (nur kein Verkauf oder Konkurrenzprodukt). Für die Steuerberatung gibt es Beleg-Export als ZIP pro Jahr und JSON-Export für alles Übrige."
+					      }
+					    }
+					  ]
+					}
+				</script>
 			</div>
 		</section>
 		<!-- ============ §11 SCHLUSS-CTA ============ -->
-		<section id="download" class="px-5 sm:px-8 pb-24 sm:pb-32">
+		<section id="download" class="px-5 sm:px-8" style="padding-top:clamp(5rem,9vw,8rem);padding-bottom:clamp(3rem,5vw,4.5rem)">
 			<div class="reveal relative mx-auto max-w-7xl rounded-[2rem] overflow-hidden text-center px-6 py-20 sm:py-28"
 				style="background:#2463EB">
 				<div class="relative">
@@ -2654,64 +2366,40 @@
 					<p class="mt-5 mx-auto max-w-[46ch] text-white/85 text-[1.12rem] leading-relaxed"> Kontor macht die
 						Buchhaltung, die Freiberufler wirklich haben – korrekt, lokal, leicht. </p>
 					<div class="mt-9 flex flex-wrap items-center justify-center gap-3">
-						<a href="https://apps.apple.com/app/kontor-buchhaltung/id6788498504" target="_blank" rel="noopener"
+						<a href="https://apps.apple.com/app/kontor-buchhaltung/id6788498504" target="_blank"
+							rel="noopener"
 							class="inline-flex items-center gap-2.5 rounded-full px-6 h-[3.25rem] text-[1rem] font-semibold bg-white text-[#1d1d1f] hover:bg-white/90">
 							<svg style="width:15px;height:20px;flex:none" viewBox="0 0 384 512" fill="currentColor"
 								aria-hidden="true">
 								<path
 									d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
-							</svg>
-							Kostenlos im Mac App Store </a>
+							</svg> Kostenlos im Mac App Store </a>
 						<a href="https://github.com/Wiredframe/kontor-buchhaltung" target="_blank" rel="noopener"
 							class="inline-flex items-center gap-2 rounded-full px-6 h-[3.25rem] text-[1rem] font-medium text-white border border-white/40 hover:bg-white/10">
 							Quellcode auf GitHub </a>
 					</div>
-					<p class="mt-5 text-white/85 text-[.88rem]">Kostenlos · signiert &amp; sandboxed · Auto-Updates · keine
-						Cloud · macOS&nbsp;15+</p>
-					<div class="mx-auto text-left"
-						style="margin-top:2.6rem;max-width:33rem;background:rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.2);border-radius:1.1rem;padding:1.2rem 1.35rem">
-						<p class="text-white" style="font-size:.92rem;font-weight:600">Lieber quelloffen, ohne App&nbsp;Store?
-							Per Homebrew:</p>
-						<div
-							style="margin-top:.7rem;overflow-x:auto;background:rgba(0,0,0,.34);border-radius:.75rem;padding:.85rem 1rem">
-							<pre
-								style="margin:0;color:rgba(255,255,255,.96);font-size:.8rem;line-height:1.7;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"><code>brew tap wiredframe/kontor
-brew trust --cask wiredframe/kontor/kontor
-brew install --cask --no-quarantine kontor</code></pre>
-						</div>
-						<p style="margin-top:.75rem;font-size:.85rem;line-height:1.65;color:rgba(255,255,255,.72)">… oder das
-							fertige Build als <a href="https://github.com/Wiredframe/kontor-buchhaltung/releases"
-								target="_blank" rel="noopener"
-								class="underline underline-offset-2 hover:text-white">ZIP aus den Releases</a>. Diese Builds
-							sind quelloffen, aber nicht signiert – beim ersten Start Rechtsklick aufs App-Icon → „Öffnen“.
-							<a href="https://github.com/Wiredframe/kontor-buchhaltung#installation" target="_blank"
-								rel="noopener" class="underline underline-offset-2 hover:text-white">Kurzanleitung</a></p>
-					</div>
+					<p class="mt-5 text-white/85 text-[.88rem]">Kostenlos · signiert &amp; sandboxed · Auto-Updates ·
+						keine Cloud · macOS&nbsp;15+</p>
 				</div>
 			</div>
 		</section>
 		<!-- ============ §11b SPENDEN (unter CTA) ============ -->
-		<section id="spenden" class="py-24 sm:py-32">
+		<section id="spenden" style="padding-top:clamp(2.5rem,4vw,4rem);padding-bottom:clamp(5rem,9vw,8rem)">
 			<div class="mx-auto max-w-7xl px-5 sm:px-8">
-				<div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+				<div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
 					<!-- links: Text -->
 					<div class="reveal max-w-xl">
-						<h2
-							class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
-							Freiwillig, mehr ist es nicht. </h2>
-						<p class="mt-5 font-display text-[1.25rem] font-semibold leading-snug" style="color:var(--muted)">Du kannst mir einen
-							freiwilligen Betrag schenken, wenn dir danach ist. Eine private Zuwendung, <span class="brand-text">ohne Gegenleistung, ohne Bedingung, ohne Vorteile</span>. Du
-							kaufst nichts und bekommst nichts dafür.</p>
-						<p class="mt-4 text-[.92rem]" style="color:var(--muted)">Ob einmalig oder monatlich – ganz wie
-							du magst. Es verpflichtet zu nichts und ändert nichts: alles bleibt frei und offen für alle,
-							auch ohne Spende.</p>
+						<h2 class="font-display font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.06] text-balance">
+							Spendier mir einen Kaffee. </h2>
+						<p class="mt-5 font-display text-[1.25rem] font-semibold leading-snug"
+							style="color:var(--muted)">Wenn dir danach ist, schenk mir einen freiwilligen Betrag. Eine
+							private Zuwendung, <span class="brand-text">ohne Gegenleistung, ohne Bedingung, ohne
+								Vorteile</span>, einmalig oder monatlich. Es verpflichtet zu nichts: alles bleibt frei und
+							offen für alle, auch ohne Spende.</p>
 					</div>
 					<!-- rechts: Spenden-Karte -->
 					<div class="reveal d1 relative rounded-3xl p-8 sm:p-10 overflow-hidden"
 						style="background:var(--surface);border:1px solid color-mix(in srgb,var(--brand) 40%,var(--hair));box-shadow:var(--shadow)">
-						<div class="absolute inset-x-0 top-0 h-1"
-							style="background:#2463EB"></div>
-						<span class="font-semibold text-[.95rem]">Zwei Wege</span>
 						<a data-donate href="#spenden"
 							class="btn-primary mt-5 inline-flex items-center justify-center gap-2 rounded-full px-6 h-[3.25rem] w-full text-[1rem] font-semibold">
 							<svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -3201,24 +2889,33 @@ brew install --cask --no-quarantine kontor</code></pre>
 		})();
 	</script>
 	<script>
-		// ---- Hero App-Icon · springende Münze (Auto-Play 1×, danach Klick/Tap zum Wiederholen) ----
+		// ---- Hero App-Icon · springende Münze + Text-Rotator (Auto-Play 1×, Klick/Tap wiederholt beides) ----
 		(function () {
+			var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			var rotator = document.querySelector('.rotator');
+			function playRotator() {
+				if (!rotator || reduce) return;
+				rotator.classList.remove('play');  // laufende Animation abbrechen …
+				void rotator.offsetWidth;           // … Reflow erzwingen → sauberer Neustart
+				rotator.classList.add('play');
+			}
 			var icon = document.querySelector('.hero-appicon');
-			if (!icon) return;
-			var CLS = 'is-hopping';
-			function play() {
-				icon.classList.remove(CLS);   // laufende Animation abbrechen …
-				void icon.offsetWidth;         // … Reflow erzwingen → sauberer Neustart von vorn
-				icon.classList.add(CLS);
+			if (icon) {
+				var CLS = 'is-hopping';
+				function hop() {
+					icon.classList.remove(CLS);
+					void icon.offsetWidth;
+					icon.classList.add(CLS);
+				}
+				// nach dem Durchlauf zurück in den Ruhezustand
+				icon.addEventListener('animationend', function () { icon.classList.remove(CLS); });
+				// Klick/Tap spielt Icon-Hüpfer UND Text-Animation neu ab — vom Nutzer ausgelöst
+				icon.addEventListener('click', function () { hop(); playRotator(); });
+				// Icon-Hüpfer automatisch ~2 s nach dem Laden
+				if (!reduce) setTimeout(hop, 2000);
 			}
-			// nach dem Durchlauf zurück in den Ruhezustand
-			icon.addEventListener('animationend', function () { icon.classList.remove(CLS); });
-			// Klick/Tap spielt die Animation (neu) ab — vom Nutzer ausgelöst
-			icon.addEventListener('click', play);
-			// Auto-Play: genau einmal, ~2 s nach dem Laden — nur wenn Bewegung erwünscht
-			if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-				setTimeout(play, 2000);
-			}
+			// Text-Rotator: einmal beim Laden durchlaufen, bleibt auf „Dein Geld" stehen
+			playRotator();
 		})();
 
 		// ---- Header · Hintergrund + Schatten erst beim Scrollen einblenden ----
