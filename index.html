@@ -971,13 +971,9 @@
 						class="brand-text">was dir tatsächlich zur Verfügung steht</span>. Belege reinziehen, Kontoauszug importieren. Den Rest erledigt Kontor.
 				</p>
 				<div class="mt-9 flex flex-wrap items-center justify-center gap-3">
-					<a href="https://apps.apple.com/app/kontor-buchhaltung/id6788498504" target="_blank" rel="noopener"
+					<a href="https://github.com/Wiredframe/kontor-buchhaltung/releases/latest" target="_blank" rel="noopener"
 						class="btn-primary inline-flex items-center gap-2.5 rounded-full px-6 h-[3.25rem] text-[1rem] font-semibold">
-						<svg style="width:15px;height:20px;flex:none" viewBox="0 0 384 512" fill="currentColor"
-							aria-hidden="true">
-							<path
-								d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
-						</svg> Kostenlos im Mac App Store </a>
+						<svg style="width:18px;height:18px;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" /></svg> Kostenlos für macOS laden </a>
 					<a href="#frei"
 						class="btn-ghost inline-flex items-center gap-2 rounded-full px-6 h-[3.25rem] text-[1rem] font-medium">
 						Funktionen ansehen <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -2268,8 +2264,7 @@
 								class="font-medium text-[1.08rem]">Was kostet Kontor?</span><span
 								class="chev num shrink-0" style="color:var(--brand)">+</span></summary>
 						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Nichts. Kontor ist kostenlos und
-							quelloffen. Du kannst die App aus dem Mac App Store laden, über GitHub beziehen oder selbst
-							bauen. Es gibt kein Abo und keine laufenden Gebühren. Freiwillige Spenden sind willkommen,
+							quelloffen. Du lädst die App über GitHub, installierst sie per Homebrew oder baust sie selbst. Es gibt kein Abo und keine laufenden Gebühren. Freiwillige Spenden sind willkommen,
 							aber keine Voraussetzung.</p>
 					</details>
 					<details class="faq py-5">
@@ -2309,13 +2304,14 @@
 					</details>
 					<details class="faq py-5">
 						<summary class="flex items-center justify-between gap-4"><span
-								class="font-medium text-[1.08rem]">Wie installiere ich Kontor ohne den Mac App
-								Store?</span><span class="chev num shrink-0" style="color:var(--brand)">+</span>
+								class="font-medium text-[1.08rem]">Wie installiere ich Kontor?</span><span class="chev num shrink-0" style="color:var(--brand)">+</span>
 						</summary>
-						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Über GitHub: per Homebrew oder als
-							ZIP aus den Releases. Die genauen Schritte stehen im GitHub-Repo. Diese Community-Builds
-							sind quelloffen, aber nicht signiert, beim ersten Start also Rechtsklick aufs App-Icon und
-							„Öffnen“.</p>
+						<p class="mt-3 leading-relaxed" style="color:var(--muted)">Per Homebrew mit <code class="num">brew install --cask wiredframe/tap/kontor</code>
+							oder als ZIP aus den GitHub-Releases. Die genauen Schritte stehen im GitHub-Repo. Die Builds
+							sind quelloffen, aber nicht notariell signiert, beim ersten Start also Rechtsklick aufs
+							App-Icon und „Öffnen“. Im Mac App Store ist Kontor nicht mehr erhältlich.
+							Installierte Store-Versionen laufen weiter, Updates gibt es nur noch über GitHub und
+							Homebrew.</p>
 					</details>
 					<details class="faq py-5">
 						<summary class="flex items-center justify-between gap-4"><span
@@ -2377,7 +2373,7 @@
 					      "name": "Was kostet Kontor?",
 					      "acceptedAnswer": {
 					        "@type": "Answer",
-					        "text": "Nichts. Kontor ist kostenlos und quelloffen. Du kannst die App aus dem Mac App Store laden, über GitHub beziehen oder selbst bauen. Es gibt kein Abo und keine laufenden Gebühren. Freiwillige Spenden sind willkommen, aber keine Voraussetzung."
+					        "text": "Nichts. Kontor ist kostenlos und quelloffen. Du lädst die App über GitHub, installierst sie per Homebrew oder baust sie selbst. Es gibt kein Abo und keine laufenden Gebühren. Freiwillige Spenden sind willkommen, aber keine Voraussetzung."
 					      }
 					    },
 					    {
@@ -2414,10 +2410,10 @@
 					    },
 					    {
 					      "@type": "Question",
-					      "name": "Wie installiere ich Kontor ohne den Mac App Store?",
+					      "name": "Wie installiere ich Kontor?",
 					      "acceptedAnswer": {
 					        "@type": "Answer",
-					        "text": "Über GitHub: per Homebrew oder als ZIP aus den Releases. Die genauen Schritte stehen im GitHub-Repo. Diese Community-Builds sind quelloffen, aber nicht signiert, beim ersten Start also Rechtsklick aufs App-Icon und „Öffnen“."
+					        "text": "Per Homebrew mit brew install --cask wiredframe/tap/kontor oder als ZIP aus den GitHub-Releases. Die genauen Schritte stehen im GitHub-Repo. Die Builds sind quelloffen, aber nicht notariell signiert, beim ersten Start also Rechtsklick aufs App-Icon und „Öffnen“. Im Mac App Store ist Kontor nicht mehr erhältlich. Installierte Store-Versionen laufen weiter, Updates gibt es nur noch über GitHub und Homebrew."
 					      }
 					    },
 					    {
@@ -2445,19 +2441,15 @@
 					<p class="mt-5 mx-auto max-w-[46ch] text-white/85 text-[1.12rem] leading-relaxed"> Kontor hält
 						Einnahmen, Ausgaben, Steuern, KSK und Rücklagen an einem Ort zusammen. Lokal auf deinem Mac. </p>
 					<div class="mt-9 flex flex-wrap items-center justify-center gap-3">
-						<a href="https://apps.apple.com/app/kontor-buchhaltung/id6788498504" target="_blank"
+						<a href="https://github.com/Wiredframe/kontor-buchhaltung/releases/latest" target="_blank"
 							rel="noopener"
 							class="inline-flex items-center gap-2.5 rounded-full px-6 h-[3.25rem] text-[1rem] font-semibold bg-white text-[#1d1d1f] hover:bg-white/90">
-							<svg style="width:15px;height:20px;flex:none" viewBox="0 0 384 512" fill="currentColor"
-								aria-hidden="true">
-								<path
-									d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
-							</svg> Kostenlos im Mac App Store </a>
+							<svg style="width:18px;height:18px;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" /></svg> Kostenlos für macOS laden </a>
 						<a href="https://github.com/Wiredframe/kontor-buchhaltung" target="_blank" rel="noopener"
 							class="inline-flex items-center gap-2 rounded-full px-6 h-[3.25rem] text-[1rem] font-medium text-white border border-white/40 hover:bg-white/10">
 							Quellcode auf GitHub </a>
 					</div>
-					<p class="mt-5 text-white/85 text-[.88rem]">Kostenlos · signiert &amp; sandboxed · Auto-Updates ·
+					<p class="mt-5 text-white/85 text-[.88rem]">Kostenlos · per Homebrew oder als ZIP · sandboxed ·
 						keine Cloud · macOS&nbsp;15+</p>
 				</div>
 			</div>
